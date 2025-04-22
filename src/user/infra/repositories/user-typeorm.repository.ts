@@ -37,4 +37,12 @@ export class UserTypeORMRepository implements UserRepository {
       UserEntityAdapter.fromPersistence(user).toDomain(),
     );
   }
+
+  async findByToken(token: string): Promise<User | void> {
+    const user = await this.userRepository.findOneBy({ token });
+    if (!user) {
+      return;
+    }
+    return UserEntityAdapter.fromPersistence(user).toDomain();
+  }
 }

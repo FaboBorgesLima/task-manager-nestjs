@@ -5,6 +5,7 @@ export interface UserRepository {
   findOne(id: string): Promise<User | void>;
   saveOne(user: User): Promise<User | void>;
   deleteOne(id: string): Promise<void>;
+  findByToken(token: string): Promise<User | void>;
 }
 
 export const UserRepository = Symbol('UserRepository');

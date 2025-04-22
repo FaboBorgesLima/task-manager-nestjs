@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { randomBytes, randomUUID } from 'crypto';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class TokenGenerator {

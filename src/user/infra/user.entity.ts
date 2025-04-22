@@ -14,6 +14,6 @@ export class UserEntity {
   @Column({ type: 'char', length: 43, nullable: false })
   public password: string;
 
-  @Column({ type: 'uuid', nullable: false })
+  @Column({ type: 'uuid', unique: true, nullable: false })
   public token: string;
 }

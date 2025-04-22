@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../domain/user';
 import { UserRepository } from '../domain/user.repository';
 import { UserTypeORMRepository } from '../infra/repositories/user-typeorm.repository';
+import { UserEntity } from '../infra/user.entity';
 
 @Module({
   controllers: [UserController],
@@ -13,6 +14,6 @@ import { UserTypeORMRepository } from '../infra/repositories/user-typeorm.reposi
       useClass: UserTypeORMRepository,
     },
   ],
-  imports: [TypeOrmModule.forFeature([User])],
+  imports: [TypeOrmModule.forFeature([UserEntity])],
 })
 export class UserModule {}

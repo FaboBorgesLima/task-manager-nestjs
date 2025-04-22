@@ -4,7 +4,7 @@ import { TokenGenerator } from '../../token-generator/token-generator';
 export class User {
   public id?: string;
 
-  public name: string;
+  protected name: string;
 
   protected email: string;
 
@@ -40,9 +40,37 @@ export class User {
     return regex.test(email);
   }
 
+  public canUpdate(user: User): boolean {
+    return this.id === user.id;
+  }
+
   public getPassword(): string {
     return this.password;
   }
+
+  public setPassword(password: string, user: User): void {
+    if (!this.canUpdate(user)) {
+      throw new Error('User not authorized to update password');
+    }
+
+    if (!HashMaker.isHash(password)) {
+      this.password = HashMaker.make(password);
+      return;
+    }
+    this.password = password;
+  }
+
+  public setName(name: string, user: User): void {
+    if (!this.canUpdate(user)) {
+      throw new Error('User not authorized to update name');
+    }
+    this.name = name;
+  }
+
+  public getName(): string {
+    return this.name;
+  }
+
   public getEmail(): string {
     return this.email;
   }

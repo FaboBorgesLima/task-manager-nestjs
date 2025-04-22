@@ -26,7 +26,7 @@ export class UserEntityAdapter {
 
   public toPersistence(): UserEntity {
     const userEntity = new UserEntity();
-    userEntity.name = this.user.name;
+    userEntity.name = this.user.getName();
     userEntity.email = this.user.getEmail();
     userEntity.password = this.user.getPassword();
     userEntity.token = this.user.token;
