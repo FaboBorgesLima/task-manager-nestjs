@@ -21,23 +21,29 @@ export class UserController {
   ) {}
   @Get('/')
   public async findAll() {
-    return await this.userRepository.findAll();
+    return (await this.userRepository.findAll()).map((user) => user.toJSON());
   }
 
   @Post('/')
   public async create(@Body() userCreateDto: UserCreateDto) {
-    const user = User.create(
+    let user = User.create(
       userCreateDto.name,
       userCreateDto.email,
       userCreateDto.password,
     );
 
-    return await this.userRepository.saveOne(user);
+    return (await this.userRepository.saveOrFail(user)).toJSON();
   }
 
   @Get(':id')
   public async findOne(@Param('id') id: string) {
-    return await this.userRepository.findOne(id);
+    const user = await this.userRepository.findOne(id);
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    return user.toJSON();
   }
 
   @Put(':id')

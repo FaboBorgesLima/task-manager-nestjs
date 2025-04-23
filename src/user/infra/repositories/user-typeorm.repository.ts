@@ -27,6 +27,14 @@ export class UserTypeORMRepository implements UserRepository {
     return UserEntityAdapter.fromPersistence(userEntity).toDomain();
   }
 
+  async saveOrFail(user: User): Promise<User> {
+    const savedUser = await this.saveOne(user);
+    if (!savedUser) {
+      throw new Error('User not saved');
+    }
+    return savedUser;
+  }
+
   async deleteOne(id: string): Promise<void> {
     await this.userRepository.delete(id);
   }

@@ -14,6 +14,9 @@ export class User {
 
   constructor(name: string, email: string, password: string, token: string) {
     this.name = name;
+    if (!User.isEmail(email)) {
+      throw new Error('Invalid email format');
+    }
     this.email = email;
     if (!HashMaker.isHash(password)) {
       throw new Error('Password must be a hash');
@@ -73,5 +76,14 @@ export class User {
 
   public getEmail(): string {
     return this.email;
+  }
+
+  public toJSON() {
+    return {
+      id: this.id,
+      name: this.name,
+      email: this.email,
+      token: this.token,
+    };
   }
 }

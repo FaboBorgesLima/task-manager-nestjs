@@ -7,6 +7,14 @@ import { randomUUID } from 'crypto';
 export class UserMemoryRepository implements UserRepository {
   private users: User[] = [];
 
+  async saveOrFail(user: User): Promise<User> {
+    const savedUser = await this.saveOne(user);
+    if (!savedUser) {
+      throw new Error('User not saved');
+    }
+    return savedUser;
+  }
+
   findAll(): Promise<User[]> {
     return Promise.resolve(this.users);
   }
