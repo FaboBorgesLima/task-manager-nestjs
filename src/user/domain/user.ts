@@ -13,14 +13,21 @@ export class User {
   public token: string;
 
   constructor(name: string, email: string, password: string, token: string) {
+    if (!name || name.length < 3) {
+      throw new Error('Name must be at least 3 characters long');
+    }
+
     this.name = name;
+
     if (!User.isEmail(email)) {
       throw new Error('Invalid email format');
     }
     this.email = email;
+
     if (!HashMaker.isHash(password)) {
       throw new Error('Password must be a hash');
     }
+
     this.password = password;
     this.token = token;
   }
@@ -29,7 +36,16 @@ export class User {
     if (!this.isEmail(email)) {
       throw new Error('Invalid email format');
     }
+
     let hashPassword = password;
+
+    if (!password) {
+      throw new Error('Password is required');
+    }
+
+    if (password.length < 8) {
+      throw new Error('Password must be at least 8 characters long');
+    }
 
     if (!HashMaker.isHash(hashPassword)) {
       hashPassword = HashMaker.make(password);
@@ -84,6 +100,13 @@ export class User {
       name: this.name,
       email: this.email,
       token: this.token,
+    };
+  }
+
+  public toJSONProfile() {
+    return {
+      id: this.id,
+      name: this.name,
     };
   }
 }

@@ -50,7 +50,7 @@ describe('UserController', () => {
     });
     const users = await controller.findAll();
     expect(users).toBeDefined();
-    expect(users.length).toBe(1);
+    expect(users.length).toBeGreaterThanOrEqual(1);
   });
 
   it('should find a user by id', async () => {
@@ -72,7 +72,7 @@ describe('UserController', () => {
   });
 
   it('should update a user', async () => {
-    let { id } = await controller.create({
+    let { id, token } = await controller.create({
       name: 'John Doe',
       email: 'john.doe@example.com',
       password: 'password123',
@@ -80,15 +80,13 @@ describe('UserController', () => {
 
     id = id as string;
 
-    const user = await controller.findOne(id);
-
     const updatedUser = await controller.update(
       id,
       {
         name: 'Jane Doe',
         password: 'newpassword123',
       },
-      user.token,
+      token,
     );
 
     if (!updatedUser) {

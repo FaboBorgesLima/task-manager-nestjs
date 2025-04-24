@@ -53,4 +53,20 @@ export class UserTypeORMRepository implements UserRepository {
     }
     return UserEntityAdapter.fromPersistence(user).toDomain();
   }
+
+  async findByEmailPassword(
+    email: string,
+    password: string,
+  ): Promise<User | void> {
+    const user = await this.userRepository.findOneBy({
+      email,
+      password,
+    });
+
+    if (!user) {
+      return;
+    }
+
+    return UserEntityAdapter.fromPersistence(user).toDomain();
+  }
 }

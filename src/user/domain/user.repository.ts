@@ -7,6 +7,7 @@ export interface UserRepository {
   deleteOne(id: string): Promise<void>;
   findByToken(token: string): Promise<User | void>;
   saveOrFail(user: User): Promise<User>;
+  findByEmailPassword(email: string, password: string): Promise<User | void>;
 }
 
 export const UserRepository = Symbol('UserRepository');

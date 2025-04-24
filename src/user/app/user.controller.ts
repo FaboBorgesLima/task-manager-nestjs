@@ -4,6 +4,8 @@ import {
   Delete,
   Get,
   Headers,
+  HttpException,
+  HttpStatus,
   Inject,
   Param,
   Post,
@@ -21,7 +23,9 @@ export class UserController {
   ) {}
   @Get('/')
   public async findAll() {
-    return (await this.userRepository.findAll()).map((user) => user.toJSON());
+    return (await this.userRepository.findAll()).map((user) =>
+      user.toJSONProfile(),
+    );
   }
 
   @Post('/')
@@ -40,10 +44,10 @@ export class UserController {
     const user = await this.userRepository.findOne(id);
 
     if (!user) {
-      throw new Error('User not found');
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
 
-    return user.toJSON();
+    return user.toJSONProfile();
   }
 
   @Put(':id')
@@ -58,11 +62,11 @@ export class UserController {
     ]);
 
     if (!requestUser) {
-      throw new Error('Needs auth token');
+      throw new HttpException('Needs auth token', HttpStatus.UNAUTHORIZED);
     }
 
     if (!user) {
-      throw new Error('User not found');
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
 
     if (userUpdateDto.name) {
@@ -87,15 +91,18 @@ export class UserController {
     ];
 
     if (!requestUser) {
-      throw new Error('Needs auth token');
+      throw new HttpException('Needs auth token', HttpStatus.UNAUTHORIZED);
     }
 
     if (!user) {
-      throw new Error('User not found');
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
 
     if (!user.canUpdate(requestUser)) {
-      throw new Error('User not authorized to delete');
+      throw new HttpException(
+        'User not authorized to delete',
+        HttpStatus.FORBIDDEN,
+      );
     }
 
     return await this.userRepository.deleteOne(id);

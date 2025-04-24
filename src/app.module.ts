@@ -4,10 +4,11 @@ import { AppService } from './app.service';
 import { UserModule } from './user/app/user.module';
 import { HashMaker } from './hash-maker/hash-maker';
 import { TokenGenerator } from './token-generator/token-generator';
+import { AuthModule } from './auth/app/auth.module';
 import TypeOrmModule from './database/typeorm.module';
 
 @Module({
-  imports: [UserModule, TypeOrmModule],
+  imports: [UserModule, TypeOrmModule, AuthModule],
   controllers: [AppController],
   providers: [AppService, HashMaker, TokenGenerator],
 })
