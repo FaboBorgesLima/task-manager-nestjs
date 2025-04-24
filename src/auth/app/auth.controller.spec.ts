@@ -53,4 +53,20 @@ describe('AuthController', () => {
 
     expect(loggedInUser).toBeDefined();
   });
+
+  it('should return user from token', async () => {
+    const userRepository = new UserMemoryRepository();
+    const user = User.create('John Doe', 'test@testeee.com', 'password123');
+    await userRepository.saveOne(user);
+
+    const loggedInUser = await controller.login({
+      email: 'test@testeee.com',
+      password: 'password123',
+    });
+    expect(loggedInUser).toBeDefined();
+    const userFromToken = await controller.me(loggedInUser.token);
+
+    expect(userFromToken).toBeDefined();
+    expect(userFromToken.email).toBe('test@testeee.com');
+  });
 });
