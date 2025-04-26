@@ -83,16 +83,25 @@ export class User {
     return this.password;
   }
 
-  public setPassword(password: string, user: User): void {
+  public changePasswordAndRandomizeToken(password: string, user: User): void {
     if (!this.canUpdate(user)) {
       throw new Error('User not authorized to update password');
     }
+    let hashPassword = password;
 
     if (!HashMaker.isHash(password)) {
-      this.password = HashMaker.make(password);
-      return;
+      hashPassword = HashMaker.make(password);
     }
-    this.password = password;
+
+    if (hashPassword != this.password) {
+      this.randomizeToken();
+    }
+
+    this.password = hashPassword;
+  }
+
+  public randomizeToken(): void {
+    this.token = TokenGenerator.generate();
   }
 
   public setName(name: string, user: User): void {

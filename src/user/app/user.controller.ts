@@ -74,7 +74,7 @@ export class UserController {
     }
 
     if (userUpdateDto.password) {
-      user.setPassword(userUpdateDto.password, requestUser);
+      user.changePasswordAndRandomizeToken(userUpdateDto.password, requestUser);
     }
 
     return await this.userRepository.saveOne(user);
