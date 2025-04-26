@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { isHash } from 'class-validator';
 import { createHmac } from 'crypto';
 
 @Injectable()
@@ -14,6 +13,7 @@ export class HashMaker {
     hmac.update(password);
     return hmac.digest('base64url');
   }
+
   public isHash(hash: string): boolean {
     return HashMaker.isHash(hash);
   }

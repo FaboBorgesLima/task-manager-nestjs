@@ -12,7 +12,17 @@ export class User {
 
   public token: string;
 
-  constructor(name: string, email: string, password: string, token: string) {
+  private createdAt: Date;
+  public updatedAt: Date;
+
+  constructor(
+    name: string,
+    email: string,
+    password: string,
+    token: string,
+    createdAt: Date = new Date(),
+    updatedAt: Date = new Date(),
+  ) {
     if (!name || name.length < 3) {
       throw new Error('Name must be at least 3 characters long');
     }
@@ -30,6 +40,12 @@ export class User {
 
     this.password = password;
     this.token = token;
+    this.createdAt = createdAt;
+    this.updatedAt = updatedAt;
+  }
+
+  public getCreatedAt(): Date {
+    return this.createdAt;
   }
 
   public static create(name: string, email: string, password: string): User {

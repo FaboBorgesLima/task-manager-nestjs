@@ -30,7 +30,7 @@ export class UserController {
 
   @Post('/')
   public async create(@Body() userCreateDto: UserCreateDto) {
-    let user = User.create(
+    const user = User.create(
       userCreateDto.name,
       userCreateDto.email,
       userCreateDto.password,

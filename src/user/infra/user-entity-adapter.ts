@@ -18,6 +18,8 @@ export class UserEntityAdapter {
       user.email,
       user.password,
       user.token,
+      user.createdAt,
+      user.updatedAt,
     );
 
     userDomain.id = user.id?.toString();
@@ -30,6 +32,8 @@ export class UserEntityAdapter {
     userEntity.email = this.user.getEmail();
     userEntity.password = this.user.getPassword();
     userEntity.token = this.user.token;
+    userEntity.createdAt = this.user.getCreatedAt();
+    userEntity.updatedAt = this.user.updatedAt;
     if (this.user.id) {
       userEntity.id = this.user.id;
     }
