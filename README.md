@@ -2,10 +2,10 @@
 
   - [ ] **ID1:** Configurar corretamente o ambiente de desenvolvimento e criar a API utilizando NestJS, com rotas e controladores que seguem a arquitetura modular.
   - [ ] **ID2:** Aplicar boas práticas de organização da lógica de negócios, garantindo que os services contenham a lógica de negócio e sejam chamados pelos controladores, separando responsabilidades corretamente.
-  - [ ] **ID3:** Utilizar providers e configurar adequadamente a injeção de dependência no NestJS, garantindo uma arquitetura modular e escalável.
-  - [ ] **ID4:** Demonstrar habilidade de criar e manipular rotas HTTP, manipulando parâmetros de rota, query e body, lidando corretamente com requisições e respostas.
-  - [ ] **ID5:** Aplicar boas práticas de tratamento de erros, utilizando filtros globais e personalizando as mensagens de erro para garantir respostas claras e consistentes.
-  - [ ] **ID6:** Criar classes DTO (Data Transfer Objects) para garantir a validação e consistência dos dados em diferentes endpoints, utilizando pipes para validar entradas de dados.
+  - [x] **ID3:** Utilizar providers e configurar adequadamente a injeção de dependência no NestJS, garantindo uma arquitetura modular e escalável.
+  - [x] **ID4:** Demonstrar habilidade de criar e manipular rotas HTTP, manipulando parâmetros de rota, query e body, lidando corretamente com requisições e respostas.
+  - [x] **ID5:** Aplicar boas práticas de tratamento de erros, utilizando filtros globais e personalizando as mensagens de erro para garantir respostas claras e consistentes.
+  - [x] **ID6:** Criar classes DTO (Data Transfer Objects) para garantir a validação e consistência dos dados em diferentes endpoints, utilizando pipes para validar entradas de dados.
   - [ ] **ID7:** Aplicar corretamente pipes de validação no NestJS, verificando entradas inválidas e assegurando a integridade dos dados transmitidos.
 
 - [ ] **RA2 - Implementar persistência de dados com um banco de dados relacional utilizando Prisma ou TypeORM.**
@@ -17,7 +17,7 @@
 
 - [ ] **RA3 - Realizar testes automatizados para garantir a qualidade da API.**
 
-  - [ ] **ID12:** Implementar testes automatizados (unitários ou de integração) utilizando Jest, validando funcionalidades críticas da API.
+  - [x] **ID12:** Implementar testes automatizados (unitários ou de integração) utilizando Jest, validando funcionalidades críticas da API.
   - [ ] **ID13:** Garantir a cobertura de testes para, pelo menos, as principais rotas e serviços da API, incluindo operações CRUD.
 
 - [ ] **RA4 - Gerar a documentação da API e realizar o deploy em um ambiente de produção.**

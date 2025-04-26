@@ -4,6 +4,9 @@ import { UserRepository } from '../../user/domain/user.repository';
 import { UserTypeORMRepository } from '../../user/infra/repositories/user-typeorm.repository';
 import { AuthRepository } from '../domain/auth.repository';
 import { AuthUserRepository } from '../infra/auth-user.repository';
+import { UserEntity } from '../../user/infra/user.entity';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { HashMaker } from '../../hash-maker/hash-maker';
 
 @Module({
   controllers: [AuthController],
@@ -16,6 +19,8 @@ import { AuthUserRepository } from '../infra/auth-user.repository';
       provide: UserRepository,
       useClass: UserTypeORMRepository,
     },
+    HashMaker,
   ],
+  imports: [TypeOrmModule.forFeature([UserEntity])],
 })
 export class AuthModule {}

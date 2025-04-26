@@ -72,16 +72,16 @@ describe('UserController', () => {
   });
 
   it('should update a user', async () => {
-    let { id, token } = await controller.create({
+    const { id, token } = await controller.create({
       name: 'John Doe',
       email: 'john.doe@example.com',
       password: 'password123',
     });
 
-    id = id as string;
+    const userId = id as string;
 
     const updatedUser = await controller.update(
-      id,
+      userId,
       {
         name: 'Jane Doe',
         password: 'newpassword123',
