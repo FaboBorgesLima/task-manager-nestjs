@@ -9,14 +9,6 @@ export class UserMemoryService implements UserServiceInterface {
 
   constructor() {}
 
-  async saveOrFail(user: User): Promise<User> {
-    const savedUser = await this.saveOne(user);
-    if (!savedUser) {
-      throw new Error('User not saved');
-    }
-    return savedUser;
-  }
-
   findByEmailPassword(email: string, password: string): Promise<User | void> {
     const user = UserMemoryService.users.find(
       (user) => user.getEmail() === email && user.getPassword() === password,
@@ -34,7 +26,7 @@ export class UserMemoryService implements UserServiceInterface {
     return Promise.resolve(user);
   }
 
-  saveOne(user: User): Promise<User | void> {
+  saveOne(user: User): Promise<User> {
     const existingUserIndex = UserMemoryService.users.findIndex(
       (u) => u.id === user.id,
     );

@@ -4,7 +4,7 @@ import { UserMemoryService } from '../infra/repositories/user-memory.service';
 import { UserServiceInterface } from '../domain/user.service';
 import { AuthServiceInterface } from '../../auth/domain/auth.service.interface';
 import { AuthService } from '../../auth/infra/auth.service';
-import { JwtModule, JwtService } from '@nestjs/jwt';
+import { JwtModule } from '@nestjs/jwt';
 
 describe('UserController', () => {
   let controller: UserController;
@@ -72,15 +72,16 @@ describe('UserController', () => {
       password: 'password123',
     });
 
-    const users = await controller.findAll();
-    const user = await controller.findOne(users[0].id as string);
+    const { users } = await controller.findAll();
+    const userId = users[0].id as string;
+    const user = await controller.findOne(userId);
 
     if (!user) {
       throw new Error('User not found');
     }
 
     expect(user).toBeDefined();
-    expect(user.id).toBe(users[0].id);
+    expect(user.id).toBe(users[0].id as string);
   });
 
   it('should update a user', async () => {

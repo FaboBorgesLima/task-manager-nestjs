@@ -43,7 +43,7 @@ export class UserController {
       userCreateDto.password,
     );
 
-    const savedUser = await this.userService.saveOrFail(user);
+    const savedUser = await this.userService.saveOne(user);
 
     return this.authService.toTokenAndUser(savedUser);
   }

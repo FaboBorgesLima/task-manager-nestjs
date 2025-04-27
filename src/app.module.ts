@@ -6,7 +6,7 @@ import { HashMaker } from './hash-maker/hash-maker';
 import { AuthModule } from './auth/app/auth.module';
 import TypeOrmModule from './database/typeorm.module';
 import { ConfigModule } from '@nestjs/config';
-import { JwtModule, JwtService } from '@nestjs/jwt';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
