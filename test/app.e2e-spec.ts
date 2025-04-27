@@ -4,7 +4,7 @@ import * as request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from './../src/app.module';
 import TypeormModule from '../src/database/typeorm.module';
-import datasource from '../src/database/datasource';
+import { clearDatabase } from './clearDatabase';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication<App>;
@@ -29,12 +29,7 @@ describe('AppController (e2e)', () => {
     await app.close();
   });
   afterEach(async () => {
-    await datasource.initialize();
-    for (const entity of datasource.entityMetadatas) {
-      const repository = datasource.getRepository(entity.name);
-      await repository.delete({});
-    }
-    await datasource.destroy();
+    await clearDatabase();
     await app.close();
   });
 });
