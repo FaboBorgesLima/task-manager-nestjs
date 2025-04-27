@@ -1,7 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserController } from './user.controller';
-import { UserMemoryRepository } from '../infra/repositories/user-memory.repository';
-import { UserRepository } from '../domain/user.repository';
+import { UserMemoryService } from '../infra/repositories/user-memory.service';
+import { UserServiceInterface } from '../domain/user.service';
+import { AuthServiceInterface } from '../../auth/domain/auth.service.interface';
+import { AuthService } from '../../auth/infra/auth.service';
+import { JwtModule, JwtService } from '@nestjs/jwt';
 
 describe('UserController', () => {
   let controller: UserController;
@@ -11,9 +14,19 @@ describe('UserController', () => {
       controllers: [UserController],
       providers: [
         {
-          provide: UserRepository,
-          useClass: UserMemoryRepository,
+          provide: AuthServiceInterface,
+          useClass: AuthService,
         },
+        {
+          provide: UserServiceInterface,
+          useClass: UserMemoryService,
+        },
+      ],
+      imports: [
+        JwtModule.register({
+          secret: 'test',
+          signOptions: { expiresIn: '10d' },
+        }),
       ],
     }).compile();
 
@@ -25,7 +38,7 @@ describe('UserController', () => {
   });
 
   it('should create a user', async () => {
-    const user = await controller.create({
+    const { user } = await controller.create({
       name: 'John Doe',
       email: 'john.doe@example.com',
       password: 'password123',
@@ -39,7 +52,6 @@ describe('UserController', () => {
     expect(user.name).toBe('John Doe');
     expect(user.email).toBe('john.doe@example.com');
     expect(user.id).toBeDefined();
-    expect(user.token).toHaveLength(36);
   });
 
   it('should find all users', async () => {
@@ -50,7 +62,7 @@ describe('UserController', () => {
     });
     const users = await controller.findAll();
     expect(users).toBeDefined();
-    expect(users.length).toBeGreaterThanOrEqual(1);
+    expect(users.users.length).toBeGreaterThanOrEqual(1);
   });
 
   it('should find a user by id', async () => {
@@ -72,13 +84,13 @@ describe('UserController', () => {
   });
 
   it('should update a user', async () => {
-    const { id, token } = await controller.create({
+    const { token, user } = await controller.create({
       name: 'John Doe',
       email: 'john.doe@example.com',
       password: 'password123',
     });
 
-    const userId = id as string;
+    const userId = user.id as string;
 
     const updatedUser = await controller.update(
       userId,
@@ -98,15 +110,15 @@ describe('UserController', () => {
   });
 
   it('should delete a user', async () => {
-    const { id, token } = await controller.create({
+    const { user, token } = await controller.create({
       name: 'John Doe',
       email: 'joe@example.com',
       password: 'password123',
     });
-    if (!id) {
+    if (!user.id) {
       throw new Error('User not created');
     }
 
-    await controller.delete(id, token);
+    await controller.delete(user.id, token);
   });
 });

@@ -11,21 +11,28 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { UserRepository } from '../domain/user.repository';
+import { UserServiceInterface } from '../domain/user.service';
 import { User } from '../domain/user';
 import { UserCreateDto } from './dto/user-create-dto';
 import { UserUpdateDto } from './dto/user-update-dto';
+import { AuthServiceInterface } from '../../auth/domain/auth.service.interface';
 
 @Controller('users')
 export class UserController {
   constructor(
-    @Inject(UserRepository) private readonly userRepository: UserRepository,
+    @Inject(UserServiceInterface)
+    private readonly userService: UserServiceInterface,
+    @Inject(AuthServiceInterface)
+    private readonly authService: AuthServiceInterface,
   ) {}
+
   @Get('/')
   public async findAll() {
-    return (await this.userRepository.findAll()).map((user) =>
-      user.toJSONProfile(),
-    );
+    return {
+      users: (await this.userService.findAll()).map((user) =>
+        user.toJSONProfile(),
+      ),
+    };
   }
 
   @Post('/')
@@ -36,12 +43,14 @@ export class UserController {
       userCreateDto.password,
     );
 
-    return (await this.userRepository.saveOrFail(user)).toJSON();
+    const savedUser = await this.userService.saveOrFail(user);
+
+    return this.authService.toTokenAndUser(savedUser);
   }
 
   @Get(':id')
   public async findOne(@Param('id') id: string) {
-    const user = await this.userRepository.findOne(id);
+    const user = await this.userService.findOne(id);
 
     if (!user) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
@@ -57,8 +66,8 @@ export class UserController {
     @Headers('authorization') token: string,
   ) {
     const [user, requestUser] = await Promise.all([
-      this.userRepository.findOne(id),
-      this.userRepository.findByToken(token),
+      this.userService.findOne(id),
+      this.authService.getUserFromToken(token),
     ]);
 
     if (!requestUser) {
@@ -74,10 +83,10 @@ export class UserController {
     }
 
     if (userUpdateDto.password) {
-      user.changePasswordAndRandomizeToken(userUpdateDto.password, requestUser);
+      user.changePassword(userUpdateDto.password, requestUser);
     }
 
-    return await this.userRepository.saveOne(user);
+    return await this.userService.saveOne(user);
   }
 
   @Delete(':id')
@@ -86,8 +95,8 @@ export class UserController {
     @Headers('authorization') token: string,
   ) {
     const [requestUser, user] = [
-      await this.userRepository.findByToken(token),
-      await this.userRepository.findOne(id),
+      await this.authService.getUserFromToken(token),
+      await this.userService.findOne(id),
     ];
 
     if (!requestUser) {
@@ -105,6 +114,6 @@ export class UserController {
       );
     }
 
-    return await this.userRepository.deleteOne(id);
+    return await this.userService.deleteOne(id);
   }
 }

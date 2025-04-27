@@ -3,10 +3,10 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/app/user.module';
 import { HashMaker } from './hash-maker/hash-maker';
-import { TokenGenerator } from './token-generator/token-generator';
 import { AuthModule } from './auth/app/auth.module';
 import TypeOrmModule from './database/typeorm.module';
 import { ConfigModule } from '@nestjs/config';
+import { JwtModule, JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -15,10 +15,14 @@ import { ConfigModule } from '@nestjs/config';
       isGlobal: true,
     }),
     TypeOrmModule,
+    JwtModule.register({
+      secret: process.env.JWT_SECRET,
+      signOptions: { expiresIn: '1 year' },
+    }),
     UserModule,
     AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService, HashMaker, TokenGenerator],
+  providers: [AppService, HashMaker],
 })
 export class AppModule {}

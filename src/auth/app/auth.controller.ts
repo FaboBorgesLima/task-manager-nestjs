@@ -11,12 +11,13 @@ import {
 } from '@nestjs/common';
 import { AuthLoginDto } from './dto/auth-login.dto';
 import { HashMaker } from '../../hash-maker/hash-maker';
-import { AuthRepository } from '../domain/auth.repository';
+import { AuthServiceInterface } from '../domain/auth.service.interface';
 
 @Controller('auth')
 export class AuthController {
   public constructor(
-    @Inject(AuthRepository) private readonly authRepository: AuthRepository,
+    @Inject(AuthServiceInterface)
+    private readonly authService: AuthServiceInterface,
     private readonly hashMaker: HashMaker,
   ) {}
 
@@ -24,7 +25,7 @@ export class AuthController {
   public async login(@Body() body: AuthLoginDto) {
     const { email, password } = body;
 
-    const user = await this.authRepository.findByEmailPassword(
+    const user = await this.authService.findByEmailPassword(
       email,
       this.hashMaker.make(password),
     );
@@ -36,7 +37,7 @@ export class AuthController {
       );
     }
 
-    return user.toJSON();
+    return this.authService.toTokenAndUser(user);
   }
 
   @Delete('/logout')
@@ -44,7 +45,7 @@ export class AuthController {
 
   @Get('/me')
   public async me(@Headers('authorization') token: string) {
-    const user = await this.authRepository.findByToken(token);
+    const user = await this.authService.getUserFromToken(token);
     if (!user) {
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }

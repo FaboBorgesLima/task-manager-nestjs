@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { UserRepository } from '../../domain/user.repository';
+import { UserServiceInterface } from '../../domain/user.service';
 import { User } from '../../domain/user';
 import { Repository } from 'typeorm';
 import { UserEntity } from '../user.entity';
@@ -7,7 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntityAdapter } from '../user-entity-adapter';
 
 @Injectable()
-export class UserTypeORMRepository implements UserRepository {
+export class UserTypeORMService implements UserServiceInterface {
   public constructor(
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
@@ -44,14 +44,6 @@ export class UserTypeORMRepository implements UserRepository {
     return users.map((user) =>
       UserEntityAdapter.fromPersistence(user).toDomain(),
     );
-  }
-
-  async findByToken(token: string): Promise<User | void> {
-    const user = await this.userRepository.findOneBy({ token });
-    if (!user) {
-      return;
-    }
-    return UserEntityAdapter.fromPersistence(user).toDomain();
   }
 
   async findByEmailPassword(

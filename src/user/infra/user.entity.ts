@@ -11,17 +11,14 @@ export class UserEntity {
   @PrimaryGeneratedColumn('increment', { unsigned: true, type: 'bigint' })
   public id?: string;
 
-  @Column({ type: 'varchar', length: 255, nullable: false })
+  @Column({ type: 'varchar', length: 255, nullable: false, unique: true })
   public name: string;
 
-  @Column({ type: 'varchar', length: 255, nullable: false })
+  @Column({ type: 'varchar', length: 255, nullable: false, unique: true })
   public email: string;
 
   @Column({ type: 'char', length: 43, nullable: false })
   public password: string;
-
-  @Column({ type: 'uuid', unique: true, nullable: false })
-  public token: string;
 
   @CreateDateColumn()
   public createdAt: Date;
