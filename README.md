@@ -11,25 +11,25 @@
 - [ ] **RA2 - Implementar persistência de dados com um banco de dados relacional utilizando Prisma ou TypeORM.**
 
   - [ ] **ID8:** Modelar corretamente os dados da aplicação, definindo entidades, suas relações e campos necessários, refletidos em um Diagrama de Entidade-Relacionamento (ERD).
-  - [ ] **ID9:** Configurar e conectar a API a um banco de dados relacional (PostgreSQL, MySQL, etc.) utilizando Prisma ou TypeORM.
+  - [x] **ID9:** Configurar e conectar a API a um banco de dados relacional (PostgreSQL, MySQL, etc.) utilizando Prisma ou TypeORM.
   - [ ] **ID10:** Criar e aplicar migrações de banco de dados para garantir a consistência dos dados entre desenvolvimento e produção.
-  - [ ] **ID11:** Implementar corretamente as operações CRUD (Create, Read, Update, Delete) para pelo menos uma entidade no projeto, utilizando NestJS.
+  - [x] **ID11:** Implementar corretamente as operações CRUD (Create, Read, Update, Delete) para pelo menos uma entidade no projeto, utilizando NestJS.
 
 - [ ] **RA3 - Realizar testes automatizados para garantir a qualidade da API.**
 
   - [x] **ID12:** Implementar testes automatizados (unitários ou de integração) utilizando Jest, validando funcionalidades críticas da API.
-  - [ ] **ID13:** Garantir a cobertura de testes para, pelo menos, as principais rotas e serviços da API, incluindo operações CRUD.
+  - [x] **ID13:** Garantir a cobertura de testes para, pelo menos, as principais rotas e serviços da API, incluindo operações CRUD.
 
 - [ ] **RA4 - Gerar a documentação da API e realizar o deploy em um ambiente de produção.**
 
   - [ ] **ID14:** Integrar corretamente o Swagger à API, gerando a documentação completa e interativa dos endpoints, parâmetros e respostas da API, com exemplos de requisições e respostas.
   - [ ] **ID15:** Realizar o deploy da API em uma plataforma de hospedagem na nuvem (ex.: Render.com, Heroku, Vercel, etc.), garantindo que a API esteja acessível publicamente.
   - [ ] **ID16:** Garantir que a API funcione corretamente no ambiente de produção, incluindo a documentação Swagger e o banco de dados.
-  - [ ] **ID17:** Realizar a configuração correta de variáveis de ambiente usando o ConfigModule do NestJS.
+  - [x] **ID17:** Realizar a configuração correta de variáveis de ambiente usando o ConfigModule do NestJS.
   - [ ] **ID18:** Implementar corretamente o versionamento de APIs REST no NestJS, assegurando que diferentes versões da API possam coexistir.
 
 - [ ] **RA5 - Implementar autenticação, autorização e segurança em APIs utilizando JWT, Guards, Middleware e Interceptadores.**
-  - [ ] **ID19:** Configurar a autenticação na API utilizando JWT (JSON Web Tokens).
+  - [x] **ID19:** Configurar a autenticação na API utilizando JWT (JSON Web Tokens).
   - [ ] **ID20:** Implementar controle de acesso baseado em roles e níveis de permissão, utilizando Guards para verificar permissões em rotas específicas.
   - [ ] **ID21:** Configurar e utilizar middleware para manipular requisições antes que elas cheguem aos controladores, realizando tarefas como autenticação, logging ou tratamento de CORS.
   - [ ] **ID22:** Implementar interceptadores para realizar logging ou modificar as respostas antes de enviá-las ao cliente.

@@ -1,11 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
-import { UserRepository } from '../../user/domain/user.repository';
-import { UserMemoryRepository } from '../../user/infra/repositories/user-memory.repository';
+import { UserServiceInterface } from '../../user/domain/user.service';
+import { UserMemoryService } from '../../user/infra/repositories/user-memory.service';
 import { HashMaker } from '../../hash-maker/hash-maker';
 import { User } from '../../user/domain/user';
-import { AuthRepository } from '../domain/auth.repository';
-import { AuthUserRepository } from '../infra/auth-user.repository';
+import { AuthServiceInterface } from '../domain/auth.service.interface';
+import { AuthService } from '../infra/auth.service';
+import { JwtModule } from '@nestjs/jwt';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -15,14 +16,20 @@ describe('AuthController', () => {
       controllers: [AuthController],
       providers: [
         {
-          provide: UserRepository,
-          useClass: UserMemoryRepository,
+          provide: UserServiceInterface,
+          useClass: UserMemoryService,
         },
         {
-          provide: AuthRepository,
-          useClass: AuthUserRepository,
+          provide: AuthServiceInterface,
+          useClass: AuthService,
         },
         HashMaker,
+      ],
+      imports: [
+        JwtModule.register({
+          secret: 'test',
+          signOptions: { expiresIn: '10d' },
+        }),
       ],
     }).compile();
 
@@ -34,7 +41,7 @@ describe('AuthController', () => {
   });
 
   it('should login a user', async () => {
-    const userRepository = new UserMemoryRepository();
+    const userRepository = new UserMemoryService();
 
     await expect(
       controller.login({
@@ -55,16 +62,17 @@ describe('AuthController', () => {
   });
 
   it('should return user from token', async () => {
-    const userRepository = new UserMemoryRepository();
+    const userRepository = new UserMemoryService();
     const user = User.create('John Doe', 'test@testeee.com', 'password123');
     await userRepository.saveOne(user);
 
-    const loggedInUser = await controller.login({
+    const { token } = await controller.login({
       email: 'test@testeee.com',
       password: 'password123',
     });
-    expect(loggedInUser).toBeDefined();
-    const userFromToken = await controller.me(loggedInUser.token);
+
+    expect(token).toBeDefined();
+    const userFromToken = await controller.me(token);
 
     expect(userFromToken).toBeDefined();
     expect(userFromToken.email).toBe('test@testeee.com');

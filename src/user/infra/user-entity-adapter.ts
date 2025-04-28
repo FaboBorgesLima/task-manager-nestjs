@@ -17,7 +17,6 @@ export class UserEntityAdapter {
       user.name,
       user.email,
       user.password,
-      user.token,
       user.createdAt,
       user.updatedAt,
     );
@@ -31,7 +30,6 @@ export class UserEntityAdapter {
     userEntity.name = this.user.getName();
     userEntity.email = this.user.getEmail();
     userEntity.password = this.user.getPassword();
-    userEntity.token = this.user.token;
     userEntity.createdAt = this.user.getCreatedAt();
     userEntity.updatedAt = this.user.updatedAt;
     if (this.user.id) {

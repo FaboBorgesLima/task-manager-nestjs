@@ -1,5 +1,4 @@
 import { HashMaker } from '../../hash-maker/hash-maker';
-import { TokenGenerator } from '../../token-generator/token-generator';
 
 export class User {
   public id?: string;
@@ -10,8 +9,6 @@ export class User {
 
   protected password: string;
 
-  public token: string;
-
   private createdAt: Date;
   public updatedAt: Date;
 
@@ -19,7 +16,6 @@ export class User {
     name: string,
     email: string,
     password: string,
-    token: string,
     createdAt: Date = new Date(),
     updatedAt: Date = new Date(),
   ) {
@@ -39,7 +35,6 @@ export class User {
     }
 
     this.password = password;
-    this.token = token;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
   }
@@ -67,7 +62,7 @@ export class User {
       hashPassword = HashMaker.make(password);
     }
 
-    return new User(name, email, hashPassword, TokenGenerator.generate());
+    return new User(name, email, hashPassword);
   }
 
   public static isEmail(email: string): boolean {
@@ -76,14 +71,18 @@ export class User {
   }
 
   public canUpdate(user: User): boolean {
-    return this.id === user.id;
+    return this.password === user.password && this.id === user.id;
+  }
+
+  public canDelete(user: User): boolean {
+    return this.password === user.password && this.id === user.id;
   }
 
   public getPassword(): string {
     return this.password;
   }
 
-  public changePasswordAndRandomizeToken(password: string, user: User): void {
+  public changePassword(password: string, user: User): void {
     if (!this.canUpdate(user)) {
       throw new Error('User not authorized to update password');
     }
@@ -93,15 +92,7 @@ export class User {
       hashPassword = HashMaker.make(password);
     }
 
-    if (hashPassword != this.password) {
-      this.randomizeToken();
-    }
-
     this.password = hashPassword;
-  }
-
-  public randomizeToken(): void {
-    this.token = TokenGenerator.generate();
   }
 
   public setName(name: string, user: User): void {
@@ -122,9 +113,11 @@ export class User {
   public toJSON() {
     return {
       id: this.id,
+      createdAt: this.getCreatedAt(),
+      updatedAt: this.updatedAt,
+      password: this.password,
       name: this.name,
       email: this.email,
-      token: this.token,
     };
   }
 
