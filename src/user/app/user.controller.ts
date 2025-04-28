@@ -16,6 +16,7 @@ import { User } from '../domain/user';
 import { UserCreateDto } from './dto/user-create-dto';
 import { UserUpdateDto } from './dto/user-update-dto';
 import { AuthServiceInterface } from '../../auth/domain/auth.service.interface';
+import { errorToHttpExceptionAsync } from '../../error/error-to-http-exception';
 
 @Controller('users')
 export class UserController {
@@ -50,7 +51,11 @@ export class UserController {
 
   @Get(':id')
   public async findOne(@Param('id') id: string) {
-    const user = await this.userService.findOne(id);
+    const user = await errorToHttpExceptionAsync(
+      () => this.userService.findOne(id),
+      HttpStatus.BAD_REQUEST,
+      'Invalid user id',
+    );
 
     if (!user) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
@@ -86,7 +91,9 @@ export class UserController {
       user.changePassword(userUpdateDto.password, requestUser);
     }
 
-    return await this.userService.saveOne(user);
+    return this.authService.toTokenAndUser(
+      await this.userService.saveOne(user),
+    );
   }
 
   @Delete(':id')
@@ -107,7 +114,7 @@ export class UserController {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
 
-    if (!user.canUpdate(requestUser)) {
+    if (!user.canDelete(requestUser)) {
       throw new HttpException(
         'User not authorized to delete',
         HttpStatus.FORBIDDEN,

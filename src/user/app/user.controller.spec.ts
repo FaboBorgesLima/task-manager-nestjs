@@ -93,7 +93,7 @@ describe('UserController', () => {
 
     const userId = user.id as string;
 
-    const updatedUser = await controller.update(
+    const updateResponse = await controller.update(
       userId,
       {
         name: 'Jane Doe',
@@ -102,12 +102,12 @@ describe('UserController', () => {
       token,
     );
 
-    if (!updatedUser) {
+    if (!updateResponse) {
       throw new Error('User not updated');
     }
 
-    expect(updatedUser.getName()).toBe('Jane Doe');
-    expect(updatedUser.getPassword()).not.toBe('newpassword123');
+    expect(updateResponse.user.name).toBe('Jane Doe');
+    expect(updateResponse.user.password).not.toBe('newpassword123');
   });
 
   it('should delete a user', async () => {

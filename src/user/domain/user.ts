@@ -74,6 +74,10 @@ export class User {
     return this.password === user.password && this.id === user.id;
   }
 
+  public canDelete(user: User): boolean {
+    return this.password === user.password && this.id === user.id;
+  }
+
   public getPassword(): string {
     return this.password;
   }

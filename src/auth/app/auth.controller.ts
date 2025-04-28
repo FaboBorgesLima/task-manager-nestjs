@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   Headers,
   HttpException,
@@ -39,9 +38,6 @@ export class AuthController {
 
     return this.authService.toTokenAndUser(user);
   }
-
-  @Delete('/logout')
-  public logout() {}
 
   @Get('/me')
   public async me(@Headers('authorization') token: string) {

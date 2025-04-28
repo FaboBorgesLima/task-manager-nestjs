@@ -7,9 +7,11 @@ export class AuthTokenUserAdapter {
   public static fromDomain(user: User): AuthTokenUserAdapter {
     return new AuthTokenUserAdapter(user);
   }
+
   public toDomain(): User {
     return this.user;
   }
+
   public static fromAuthToken(authToken: AuthToken): AuthTokenUserAdapter {
     const userDomain = new User(
       authToken.user.name,
@@ -22,6 +24,7 @@ export class AuthTokenUserAdapter {
     userDomain.id = authToken.user.id?.toString();
     return AuthTokenUserAdapter.fromDomain(userDomain);
   }
+
   public toAuthToken(): AuthToken {
     const authToken: AuthToken = {
       user: {
