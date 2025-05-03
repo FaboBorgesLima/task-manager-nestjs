@@ -1,0 +1,141 @@
+import { Test, TestingModule } from '@nestjs/testing';
+import { TaskController } from './task.controller';
+import { UserServiceInterface } from '../../user/domain/user.service';
+import { UserMemoryService } from '../../user/infra/services/user-memory.service';
+import { User } from '../../user/domain/user';
+import { faker } from '@faker-js/faker/.';
+import { TaskStatus } from '../domain/task-status.enum';
+import { TaskServiceInterface } from '../domain/task.service.interface';
+import { AbstractAuthService } from '../../auth/domain/abstract-auth.service';
+import { AuthIdService } from '../../auth/infra/services/auth-id.service';
+import { TaskMemoryService } from '../infra/services/task-memory.service';
+
+describe('TaskController', () => {
+  let controller: TaskController;
+  const userService: UserServiceInterface = new UserMemoryService();
+  const taskService: TaskServiceInterface = new TaskMemoryService();
+  const authService: AbstractAuthService = new AuthIdService(userService);
+  let user: User;
+  let token: string;
+
+  beforeAll(async () => {
+    user = User.create(
+      faker.person.fullName(),
+      faker.internet.email(),
+      faker.internet.password(),
+    );
+    await userService.saveOne(user);
+    token = await authService.toToken(user);
+  });
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      controllers: [TaskController],
+      imports: [],
+      providers: [
+        {
+          provide: UserServiceInterface,
+          useValue: userService,
+        },
+        {
+          provide: TaskServiceInterface,
+          useValue: taskService,
+        },
+        {
+          provide: AbstractAuthService,
+          useValue: authService,
+        },
+      ],
+    }).compile();
+
+    controller = module.get<TaskController>(TaskController);
+  });
+
+  it('should be defined', () => {
+    expect(controller).toBeDefined();
+  });
+
+  it('should create task', async () => {
+    const task = await controller.createTask(
+      {
+        title: 'Test Task',
+        description: 'This is a test task',
+        userId: '',
+        dueDate: new Date(),
+      },
+      `Bearer ${token}`,
+    );
+
+    expect(task).toBeDefined();
+    expect(task.title).toBe('Test Task');
+    expect(task.description).toBe('This is a test task');
+    expect(task.status).toBe(TaskStatus.PENDING);
+    expect(task.userId).toBe(user.id);
+  });
+
+  it('should return tasks for a user', async () => {
+    const tasks = await controller.getTasksByUser(user, `Bearer ${token}`, {});
+    expect(tasks).toBeDefined();
+    expect(tasks).toHaveProperty('tasks');
+    expect(Array.isArray(tasks.tasks)).toBeTruthy();
+  });
+
+  it('should return a task', async () => {
+    const task = await controller.createTask(
+      {
+        title: 'Test Task',
+        description: 'This is a test task',
+        userId: '',
+        dueDate: new Date(),
+      },
+      `Bearer ${token}`,
+    );
+
+    const taskGet = await controller.getTask(task.id || '', `Bearer ${token}`);
+    expect(taskGet).toBeDefined();
+    expect(taskGet.id).toBe(task.id);
+  });
+
+  it('should update a task', async () => {
+    const task = await controller.createTask(
+      {
+        title: 'Test Task',
+        description: 'This is a test task',
+        userId: '',
+        dueDate: new Date(),
+      },
+      `Bearer ${token}`,
+    );
+
+    const updatedTask = await controller.updateTask(
+      task.id || '',
+      {
+        title: 'Updated Task',
+        description: 'This is an updated test task',
+        dueDate: new Date(),
+      },
+      `Bearer ${token}`,
+    );
+
+    expect(updatedTask).toBeDefined();
+    expect(updatedTask.title).toBe('Updated Task');
+    expect(updatedTask.description).toBe('This is an updated test task');
+  });
+
+  it('should delete a task', async () => {
+    const task = await controller.createTask(
+      {
+        title: 'Test Task',
+        description: 'This is a test task',
+        userId: '',
+        dueDate: new Date(),
+      },
+      `Bearer ${token}`,
+    );
+
+    await controller.deleteTask(task.id || '', `Bearer ${token}`);
+
+    const deletedTask = await taskService.findById(task.id || '');
+    expect(deletedTask).toBeUndefined();
+  });
+});

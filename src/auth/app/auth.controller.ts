@@ -10,13 +10,13 @@ import {
 } from '@nestjs/common';
 import { AuthLoginDto } from './dto/auth-login.dto';
 import { HashMaker } from '../../hash-maker/hash-maker';
-import { AuthServiceInterface } from '../domain/auth.service.interface';
+import { AbstractAuthService } from '../domain/abstract-auth.service';
 
 @Controller('auth')
 export class AuthController {
   public constructor(
-    @Inject(AuthServiceInterface)
-    private readonly authService: AuthServiceInterface,
+    @Inject(AbstractAuthService)
+    private readonly authService: AbstractAuthService,
     private readonly hashMaker: HashMaker,
   ) {}
 
@@ -40,8 +40,8 @@ export class AuthController {
   }
 
   @Get('/me')
-  public async me(@Headers('authorization') token: string) {
-    const user = await this.authService.getUserFromToken(token);
+  public async me(@Headers('authorization') authorization: string) {
+    const user = await this.authService.getUserFromHeader(authorization);
     if (!user) {
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }

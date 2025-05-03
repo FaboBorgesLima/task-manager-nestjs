@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { UserServiceInterface } from '../../domain/user.service';
 import { User } from '../../domain/user';
 import { Repository } from 'typeorm';
@@ -13,8 +13,26 @@ export class UserTypeORMService implements UserServiceInterface {
     private userRepository: Repository<UserEntity>,
   ) {}
 
+  private isBigInt(value: string): boolean {
+    try {
+      BigInt(value);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   async findOne(id: string): Promise<User | void> {
+    if (!id) {
+      return;
+    }
+
+    if (!this.isBigInt(id)) {
+      throw new BadRequestException('Invalid ID format');
+    }
+
     const user = await this.userRepository.findOneBy({ id });
+
     if (!user) {
       return;
     }
@@ -28,6 +46,10 @@ export class UserTypeORMService implements UserServiceInterface {
   }
 
   async deleteOne(id: string): Promise<void> {
+    if (!id || !this.isBigInt(id)) {
+      return;
+    }
+
     await this.userRepository.delete(id);
   }
 

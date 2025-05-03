@@ -1,4 +1,4 @@
-import datasource from '../src/database/datasource';
+import datasource from '../../src/database/datasource';
 
 export async function clearDatabase() {
   await datasource.initialize();

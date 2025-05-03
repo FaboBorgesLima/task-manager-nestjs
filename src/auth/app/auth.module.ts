@@ -1,39 +1,27 @@
 import { Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
-import { UserServiceInterface } from '../../user/domain/user.service';
-import { UserTypeORMService } from '../../user/infra/repositories/user-typeorm.service';
-import { AuthServiceInterface } from '../domain/auth.service.interface';
-import { AuthService } from '../infra/auth.service';
-import { UserEntity } from '../../user/infra/user.entity';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { AbstractAuthService } from '../domain/abstract-auth.service';
+import { AuthJwtService } from '../infra/services/auth-jwt.service';
 import { HashMaker } from '../../hash-maker/hash-maker';
-import { JwtModule } from '@nestjs/jwt';
+import { UserModule } from '../../user/app/user.module';
+import { JwtConfigModule } from '../../jwt/jwt-config.module';
 
 @Module({
   controllers: [AuthController],
   providers: [
     {
-      provide: AuthServiceInterface,
-      useClass: AuthService,
-    },
-    {
-      provide: UserServiceInterface,
-      useClass: UserTypeORMService,
+      provide: AbstractAuthService,
+      useClass: AuthJwtService,
     },
     HashMaker,
   ],
-  imports: [
-    TypeOrmModule.forFeature([UserEntity]),
-    JwtModule.register({
-      secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '10d' },
-    }),
-  ],
+  imports: [JwtConfigModule, UserModule],
   exports: [
     {
-      provide: AuthServiceInterface,
-      useClass: AuthService,
+      provide: AbstractAuthService,
+      useClass: AuthJwtService,
     },
+    UserModule,
   ],
 })
 export class AuthModule {}

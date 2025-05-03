@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserController } from './user.controller';
-import { UserMemoryService } from '../infra/repositories/user-memory.service';
+import { UserMemoryService } from '../infra/services/user-memory.service';
 import { UserServiceInterface } from '../domain/user.service';
-import { AuthServiceInterface } from '../../auth/domain/auth.service.interface';
-import { AuthService } from '../../auth/infra/auth.service';
+import { AbstractAuthService } from '../../auth/domain/abstract-auth.service';
+import { AuthJwtService } from '../../auth/infra/services/auth-jwt.service';
 import { JwtModule } from '@nestjs/jwt';
 
 describe('UserController', () => {
@@ -14,8 +14,8 @@ describe('UserController', () => {
       controllers: [UserController],
       providers: [
         {
-          provide: AuthServiceInterface,
-          useClass: AuthService,
+          provide: AbstractAuthService,
+          useClass: AuthJwtService,
         },
         {
           provide: UserServiceInterface,
@@ -99,7 +99,7 @@ describe('UserController', () => {
         name: 'Jane Doe',
         password: 'newpassword123',
       },
-      token,
+      `Bearer ${token}`,
     );
 
     if (!updateResponse) {
@@ -120,6 +120,6 @@ describe('UserController', () => {
       throw new Error('User not created');
     }
 
-    await controller.delete(user.id, token);
+    await controller.delete(user.id, `Bearer ${token}`);
   });
 });

@@ -1,3 +1,43 @@
+# Task Manager API
+
+## Description (from wiki)
+
+This application is a simple task manager that will use react-native for a mobile app, nest-js for back-end and maybe some nuxt (or next) for a web application.
+
+This project was developed for educational purposes.
+
+I hope you enjoy it
+
+## Quick Start
+
+```bash
+# Clone the repository
+git clone git@github.com:FaboBorgesLima/task-manager-nestjs.git
+```
+
+```bash
+# Go to the project directory
+cd task-manager-nestjs
+```
+
+```bash
+# Install dependencies
+npm install
+```
+
+```bash
+# run the application on docker
+docker-compose up -d
+```
+
+## Details
+
+most details about the project, like data modeling and screen prototypes, can be found in the wiki.
+
+- [Wiki](https://github.com/FaboBorgesLima/task-manager-nestjs/wiki)
+
+## Checklist
+
 - [ ] **RA1 - Projetar e desenvolver uma API funcional utilizando o framework NestJS.**
 
   - [ ] **ID1:** Configurar corretamente o ambiente de desenvolvimento e criar a API utilizando NestJS, com rotas e controladores que seguem a arquitetura modular.
@@ -10,12 +50,12 @@
 
 - [ ] **RA2 - Implementar persistência de dados com um banco de dados relacional utilizando Prisma ou TypeORM.**
 
-  - [ ] **ID8:** Modelar corretamente os dados da aplicação, definindo entidades, suas relações e campos necessários, refletidos em um Diagrama de Entidade-Relacionamento (ERD).
+  - [x] **ID8:** Modelar corretamente os dados da aplicação, definindo entidades, suas relações e campos necessários, refletidos em um Diagrama de Entidade-Relacionamento (ERD).
   - [x] **ID9:** Configurar e conectar a API a um banco de dados relacional (PostgreSQL, MySQL, etc.) utilizando Prisma ou TypeORM.
   - [ ] **ID10:** Criar e aplicar migrações de banco de dados para garantir a consistência dos dados entre desenvolvimento e produção.
   - [x] **ID11:** Implementar corretamente as operações CRUD (Create, Read, Update, Delete) para pelo menos uma entidade no projeto, utilizando NestJS.
 
-- [ ] **RA3 - Realizar testes automatizados para garantir a qualidade da API.**
+- [x] **RA3 - Realizar testes automatizados para garantir a qualidade da API.**
 
   - [x] **ID12:** Implementar testes automatizados (unitários ou de integração) utilizando Jest, validando funcionalidades críticas da API.
   - [x] **ID13:** Garantir a cobertura de testes para, pelo menos, as principais rotas e serviços da API, incluindo operações CRUD.

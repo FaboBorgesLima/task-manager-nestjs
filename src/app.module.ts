@@ -2,27 +2,21 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/app/user.module';
-import { HashMaker } from './hash-maker/hash-maker';
 import { AuthModule } from './auth/app/auth.module';
-import TypeOrmModule from './database/typeorm.module';
-import { ConfigModule } from '@nestjs/config';
-import { JwtModule } from '@nestjs/jwt';
+import { TaskModule } from './task/app/task.module';
+import { SharedModule } from './shared/shared.module';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { DomainErrorInterceptor } from './error/app/domain-error-interceptor';
 
 @Module({
-  imports: [
-    ConfigModule.forRoot({
-      envFilePath: '.env',
-      isGlobal: true,
-    }),
-    TypeOrmModule,
-    JwtModule.register({
-      secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '1 year' },
-    }),
-    UserModule,
-    AuthModule,
-  ],
+  imports: [SharedModule, UserModule, AuthModule, TaskModule],
   controllers: [AppController],
-  providers: [AppService, HashMaker],
+  providers: [
+    AppService,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: DomainErrorInterceptor,
+    },
+  ],
 })
 export class AppModule {}
