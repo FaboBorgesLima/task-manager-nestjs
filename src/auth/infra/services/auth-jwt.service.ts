@@ -1,18 +1,18 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { AuthServiceInterface } from '../domain/auth.service.interface';
-import { UserServiceInterface } from '../../user/domain/user.service';
-import { User } from 'src/user/domain/user';
+import { AbstractAuthService } from '../../domain/abstract-auth.service';
+import { UserServiceInterface } from '../../../user/domain/user.service';
+import { User } from '../../../user/domain/user';
 import { JwtService } from '@nestjs/jwt';
-import { AuthTokenUserAdapter } from './auth-token-user-adapter';
-import { AuthToken } from './auth-token';
+import { AuthTokenUserAdapter } from '../auth-token-user-adapter';
+import { AuthToken } from '../auth-token';
 
 @Injectable()
-export class AuthService implements AuthServiceInterface {
+export class AuthJwtService extends AbstractAuthService {
   constructor(
     @Inject(UserServiceInterface) private userService: UserServiceInterface,
     private jwtService: JwtService,
   ) {
-    //
+    super();
   }
   async toTokenAndUser(
     user: User,

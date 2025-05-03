@@ -1,7 +1,9 @@
+import { TaskEntity } from '../../task/infra/task.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -25,4 +27,9 @@ export class UserEntity {
 
   @UpdateDateColumn()
   public updatedAt: Date;
+
+  @OneToMany(() => TaskEntity, (task) => task.user, {
+    cascade: true,
+  })
+  public tasks?: TaskEntity[];
 }

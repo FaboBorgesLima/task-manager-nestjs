@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
 import { UserServiceInterface } from '../../user/domain/user.service';
-import { UserMemoryService } from '../../user/infra/repositories/user-memory.service';
+import { UserMemoryService } from '../../user/infra/services/user-memory.service';
 import { HashMaker } from '../../hash-maker/hash-maker';
 import { User } from '../../user/domain/user';
-import { AuthServiceInterface } from '../domain/auth.service.interface';
-import { AuthService } from '../infra/auth.service';
+import { AbstractAuthService } from '../domain/abstract-auth.service';
+import { AuthJwtService } from '../infra/services/auth-jwt.service';
 import { JwtModule } from '@nestjs/jwt';
 
 describe('AuthController', () => {
@@ -20,8 +20,8 @@ describe('AuthController', () => {
           useClass: UserMemoryService,
         },
         {
-          provide: AuthServiceInterface,
-          useClass: AuthService,
+          provide: AbstractAuthService,
+          useClass: AuthJwtService,
         },
         HashMaker,
       ],
@@ -72,7 +72,7 @@ describe('AuthController', () => {
     });
 
     expect(token).toBeDefined();
-    const userFromToken = await controller.me(token);
+    const userFromToken = await controller.me(`Bearer ${token}`);
 
     expect(userFromToken).toBeDefined();
     expect(userFromToken.email).toBe('test@testeee.com');

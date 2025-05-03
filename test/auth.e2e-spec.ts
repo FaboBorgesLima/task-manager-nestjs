@@ -5,9 +5,15 @@ import * as request from 'supertest';
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { faker } from '@faker-js/faker/.';
+import { clearDatabase } from './helpers/clearDatabase';
 
 describe('AuthController (e2e)', () => {
   let app: INestApplication<App>;
+
+  beforeAll(async () => {
+    // Clear the database before all tests
+    await clearDatabase();
+  });
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -65,9 +71,17 @@ describe('AuthController (e2e)', () => {
 
     const response = await request(app.getHttpServer())
       .get('/auth/me')
-      .set('Authorization', `${body.token}`);
+      .set('Authorization', `Bearer ${body.token}`);
 
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty('email', email);
+  });
+
+  afterEach(async () => {
+    await app.close();
+  });
+
+  afterAll(async () => {
+    await clearDatabase();
   });
 });

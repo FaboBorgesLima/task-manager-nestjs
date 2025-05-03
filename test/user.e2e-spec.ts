@@ -3,7 +3,7 @@ import TypeormModule from '../src/database/typeorm.module';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
-import { clearDatabase } from './clearDatabase';
+import { clearDatabase } from './helpers/clearDatabase';
 import { App } from 'supertest/types';
 import { User } from 'src/user/domain/user';
 import { faker } from '@faker-js/faker/.';
@@ -101,14 +101,15 @@ describe('UserController (e2e)', () => {
       user: ReturnType<User['toJSONProfile']>;
       token: string;
     };
+
     const userId = user.id;
     const response = await request(app.getHttpServer())
       .put(`/users/${userId}`)
-      .set('Authorization', token)
+      .set('Authorization', `Bearer ${token}`)
       .send({
         name: faker.person.fullName(),
-      })
-      .expect(200);
+      });
+    expect(response.status).toBe(200);
 
     expect(response.body).toHaveProperty('user.name');
     expect(response.body).toHaveProperty('user.id', userId);
@@ -131,7 +132,7 @@ describe('UserController (e2e)', () => {
     const userId = user.id;
     await request(app.getHttpServer())
       .delete(`/users/${userId}`)
-      .set('Authorization', token)
+      .set('Authorization', `Bearer ${token}`)
       .expect(200);
 
     await request(app.getHttpServer())

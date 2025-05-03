@@ -21,6 +21,11 @@ cd task-manager-nestjs
 ```
 
 ```bash
+# Install dependencies
+npm install
+```
+
+```bash
 # run the application on docker
 docker-compose up -d
 ```
@@ -45,7 +50,7 @@ most details about the project, like data modeling and screen prototypes, can be
 
 - [ ] **RA2 - Implementar persistência de dados com um banco de dados relacional utilizando Prisma ou TypeORM.**
 
-  - [ ] **ID8:** Modelar corretamente os dados da aplicação, definindo entidades, suas relações e campos necessários, refletidos em um Diagrama de Entidade-Relacionamento (ERD).
+  - [x] **ID8:** Modelar corretamente os dados da aplicação, definindo entidades, suas relações e campos necessários, refletidos em um Diagrama de Entidade-Relacionamento (ERD).
   - [x] **ID9:** Configurar e conectar a API a um banco de dados relacional (PostgreSQL, MySQL, etc.) utilizando Prisma ou TypeORM.
   - [ ] **ID10:** Criar e aplicar migrações de banco de dados para garantir a consistência dos dados entre desenvolvimento e produção.
   - [x] **ID11:** Implementar corretamente as operações CRUD (Create, Read, Update, Delete) para pelo menos uma entidade no projeto, utilizando NestJS.

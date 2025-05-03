@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  forwardRef,
   Get,
   Headers,
   HttpException,
@@ -15,16 +16,15 @@ import { UserServiceInterface } from '../domain/user.service';
 import { User } from '../domain/user';
 import { UserCreateDto } from './dto/user-create-dto';
 import { UserUpdateDto } from './dto/user-update-dto';
-import { AuthServiceInterface } from '../../auth/domain/auth.service.interface';
-import { errorToHttpExceptionAsync } from '../../error/error-to-http-exception';
+import { AbstractAuthService } from '../../auth/domain/abstract-auth.service';
 
 @Controller('users')
 export class UserController {
   constructor(
-    @Inject(UserServiceInterface)
+    @Inject(forwardRef(() => UserServiceInterface))
     private readonly userService: UserServiceInterface,
-    @Inject(AuthServiceInterface)
-    private readonly authService: AuthServiceInterface,
+    @Inject(forwardRef(() => AbstractAuthService))
+    private readonly authService: AbstractAuthService,
   ) {}
 
   @Get('/')
@@ -51,11 +51,7 @@ export class UserController {
 
   @Get(':id')
   public async findOne(@Param('id') id: string) {
-    const user = await errorToHttpExceptionAsync(
-      () => this.userService.findOne(id),
-      HttpStatus.BAD_REQUEST,
-      'Invalid user id',
-    );
+    const user = await this.userService.findOne(id);
 
     if (!user) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
@@ -68,11 +64,11 @@ export class UserController {
   public async update(
     @Param('id') id: string,
     @Body() userUpdateDto: UserUpdateDto,
-    @Headers('authorization') token: string,
+    @Headers('Authorization') authorization: string,
   ) {
     const [user, requestUser] = await Promise.all([
       this.userService.findOne(id),
-      this.authService.getUserFromToken(token),
+      this.authService.getUserFromHeader(authorization),
     ]);
 
     if (!requestUser) {
@@ -99,12 +95,12 @@ export class UserController {
   @Delete(':id')
   public async delete(
     @Param('id') id: string,
-    @Headers('authorization') token: string,
+    @Headers('Authorization') authorization: string,
   ) {
-    const [requestUser, user] = [
-      await this.authService.getUserFromToken(token),
-      await this.userService.findOne(id),
-    ];
+    const [requestUser, user] = await Promise.all([
+      this.authService.getUserFromHeader(authorization),
+      this.userService.findOne(id),
+    ]);
 
     if (!requestUser) {
       throw new HttpException('Needs auth token', HttpStatus.UNAUTHORIZED);

@@ -9,7 +9,7 @@ export class User {
 
   protected password: string;
 
-  private createdAt: Date;
+  protected createdAt: Date;
   public updatedAt: Date;
 
   constructor(
@@ -108,6 +108,10 @@ export class User {
 
   public getEmail(): string {
     return this.email;
+  }
+
+  public canViewTasks(user: User): boolean {
+    return this.id === user.id;
   }
 
   public toJSON() {
