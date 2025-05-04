@@ -13,13 +13,13 @@ export class UserEntityAdapter {
   }
 
   public static fromPersistence(user: UserEntity): UserEntityAdapter {
-    const userDomain = new User(
-      user.name,
-      user.email,
-      user.password,
-      user.createdAt,
-      user.updatedAt,
-    );
+    const userDomain = new User({
+      name: user.name,
+      email: user.email,
+      password: user.password,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    });
 
     userDomain.id = user.id?.toString();
     return UserEntityAdapter.fromDomain(userDomain);

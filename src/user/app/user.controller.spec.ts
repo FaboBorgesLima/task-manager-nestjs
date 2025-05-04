@@ -54,34 +54,28 @@ describe('UserController', () => {
     expect(user.id).toBeDefined();
   });
 
-  it('should find all users', async () => {
-    await controller.create({
-      name: 'John Doe',
-      email: 'john.doe@example.com',
-      password: 'password123',
-    });
-    const users = await controller.findAll();
-    expect(users).toBeDefined();
-    expect(users.users.length).toBeGreaterThanOrEqual(1);
-  });
-
   it('should find a user by id', async () => {
-    await controller.create({
+    const { user, token } = await controller.create({
       name: 'John Doe',
       email: 'john.doe@example.com',
       password: 'password123',
     });
-
-    const { users } = await controller.findAll();
-    const userId = users[0].id as string;
-    const user = await controller.findOne(userId);
 
     if (!user) {
       throw new Error('User not found');
     }
 
-    expect(user).toBeDefined();
-    expect(user.id).toBe(users[0].id as string);
+    const foundUser = await controller.findOne(
+      user.id as string,
+      `Bearer ${token}`,
+    );
+
+    if (!foundUser) {
+      throw new Error('User not found');
+    }
+
+    expect(foundUser).toBeDefined();
+    expect(foundUser.id).toBe(user.id as string);
   });
 
   it('should update a user', async () => {
@@ -91,10 +85,8 @@ describe('UserController', () => {
       password: 'password123',
     });
 
-    const userId = user.id as string;
-
     const updateResponse = await controller.update(
-      userId,
+      user,
       {
         name: 'Jane Doe',
         password: 'newpassword123',

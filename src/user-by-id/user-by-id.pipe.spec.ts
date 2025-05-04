@@ -22,11 +22,11 @@ describe('UserByIdPipe', () => {
   it('should throw an error if user ID is not a string', async () => {
     const pipe = new UserByIdPipe(userService);
     await userService.saveOne(
-      User.create(
-        faker.person.fullName(),
-        faker.internet.email(),
-        faker.internet.password(),
-      ),
+      User.create({
+        name: faker.person.fullName(),
+        email: faker.internet.email(),
+        password: faker.internet.password(),
+      }),
     );
     await expect(() =>
       pipe.transform(12345678, {
@@ -41,11 +41,11 @@ describe('UserByIdPipe', () => {
     const pipe = new UserByIdPipe(userService);
 
     const user = await userService.saveOne(
-      User.create(
-        faker.person.fullName(),
-        faker.internet.email(),
-        faker.internet.password(),
-      ),
+      User.create({
+        name: faker.person.fullName(),
+        email: faker.internet.email(),
+        password: faker.internet.password(),
+      }),
     );
     const result = await pipe.transform(user.id, {
       type: 'param',

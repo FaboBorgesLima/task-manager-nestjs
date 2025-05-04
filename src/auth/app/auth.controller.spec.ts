@@ -50,7 +50,11 @@ describe('AuthController', () => {
       }),
     ).rejects.toThrow();
 
-    const user = User.create('John Doe', 'test@example.com', 'password123');
+    const user = User.create({
+      name: 'John Doe',
+      email: 'test@example.com',
+      password: 'password123',
+    });
     await userRepository.saveOne(user);
 
     const loggedInUser = await controller.login({
@@ -63,7 +67,11 @@ describe('AuthController', () => {
 
   it('should return user from token', async () => {
     const userRepository = new UserMemoryService();
-    const user = User.create('John Doe', 'test@testeee.com', 'password123');
+    const user = User.create({
+      name: 'John Doe',
+      email: 'test@testeee.com',
+      password: 'password123',
+    });
     await userRepository.saveOne(user);
 
     const { token } = await controller.login({

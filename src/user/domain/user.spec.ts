@@ -5,12 +5,21 @@ describe('User', () => {
   it('should be defined', () => {
     const hash = new HashMaker();
     expect(
-      new User('name', 'email@email.com', hash.make('password')),
+      new User({
+        name: 'name',
+        email: 'email@email.com',
+        password: hash.make('password'),
+      }),
     ).toBeDefined();
   });
+
   it('should create a user', () => {
     const hash = new HashMaker();
-    const user = User.create('name', 'email@email.com', hash.make('password'));
+    const user = User.create({
+      name: 'name',
+      email: 'email@email.com',
+      password: hash.make('password'),
+    });
     expect(user).toBeDefined();
     expect(user.id).toBeUndefined();
     expect(user.getEmail()).toEqual('email@email.com');
@@ -18,15 +27,25 @@ describe('User', () => {
     expect(user.getPassword()).not.toEqual('password');
     expect(user.getPassword()).toEqual(hash.make('password'));
   });
+
   it('should throw an error if email is invalid', () => {
     const hash = new HashMaker();
     expect(() => {
-      new User('name', 'invalid-email', hash.make('password'));
+      new User({
+        name: 'name',
+        email: 'invalid-email',
+        password: hash.make('password'),
+      });
     }).toThrow();
   });
+
   it('should throw an error if password is not a hash', () => {
     expect(() => {
-      new User('name', 'email@email.com', 'not-a-hash');
+      new User({
+        name: 'name',
+        email: 'email@email.com',
+        password: 'not-a-hash',
+      });
     }).toThrow();
   });
 });

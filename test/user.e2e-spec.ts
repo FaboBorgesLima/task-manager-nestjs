@@ -53,7 +53,7 @@ describe('UserController (e2e)', () => {
     expect(response.body).toHaveProperty('users[0].name');
 
     const body = response.body as {
-      users: ReturnType<User['toJSONProfile']>[];
+      users: User[];
     };
     expect(body.users.length).toBeGreaterThanOrEqual(1);
   });
@@ -69,9 +69,7 @@ describe('UserController (e2e)', () => {
       })
       .expect(201);
 
-    const user = (
-      createResponse.body as { user: ReturnType<User['toJSONProfile']> }
-    ).user;
+    const user = (createResponse.body as { user: User }).user;
     const userId = user.id;
 
     const response = await request(app.getHttpServer())
@@ -98,7 +96,7 @@ describe('UserController (e2e)', () => {
       })
       .expect(201);
     const { user, token } = createResponse.body as {
-      user: ReturnType<User['toJSONProfile']>;
+      user: User;
       token: string;
     };
 
@@ -126,7 +124,7 @@ describe('UserController (e2e)', () => {
       })
       .expect(201);
     const { user, token } = createResponse.body as {
-      user: ReturnType<User['toJSONProfile']>;
+      user: User;
       token: string;
     };
     const userId = user.id;

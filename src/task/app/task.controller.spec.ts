@@ -19,11 +19,11 @@ describe('TaskController', () => {
   let token: string;
 
   beforeAll(async () => {
-    user = User.create(
-      faker.person.fullName(),
-      faker.internet.email(),
-      faker.internet.password(),
-    );
+    user = User.create({
+      name: faker.person.fullName(),
+      email: faker.internet.email(),
+      password: faker.internet.password(),
+    });
     await userService.saveOne(user);
     token = await authService.toToken(user);
   });
@@ -87,6 +87,7 @@ describe('TaskController', () => {
         description: 'This is a test task',
         userId: '',
         dueDate: new Date(),
+        status: TaskStatus.PENDING,
       },
       `Bearer ${token}`,
     );
@@ -103,6 +104,8 @@ describe('TaskController', () => {
         description: 'This is a test task',
         userId: '',
         dueDate: new Date(),
+
+        status: TaskStatus.PENDING,
       },
       `Bearer ${token}`,
     );

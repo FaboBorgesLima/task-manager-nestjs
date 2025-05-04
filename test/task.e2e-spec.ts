@@ -33,11 +33,11 @@ describe('TaskController (e2e)', () => {
 
     userService = moduleFixture.get<UserServiceInterface>(UserServiceInterface);
     authService = moduleFixture.get<AbstractAuthService>(AbstractAuthService);
-    user = User.create(
-      faker.person.fullName(),
-      faker.internet.email(),
-      faker.internet.password(),
-    );
+    user = User.create({
+      name: faker.person.fullName(),
+      email: faker.internet.email(),
+      password: faker.internet.password(),
+    });
 
     user = await userService.saveOne(user);
     token = await authService.toToken(user);

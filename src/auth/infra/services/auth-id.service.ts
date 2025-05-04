@@ -26,12 +26,10 @@ export class AuthIdService extends AbstractAuthService {
     return Promise.resolve(user.id);
   }
 
-  async toTokenAndUser(
-    user: User,
-  ): Promise<{ token: string; user: ReturnType<User['toJSON']> }> {
+  async toTokenAndUser(user: User): Promise<{ token: string; user: User }> {
     const token = await this.toToken(user);
 
-    return { token, user: user.toJSON() };
+    return { token, user: user };
   }
 
   public async getUserById(userId: string): Promise<User | void> {

@@ -19,11 +19,11 @@ describe('Task', () => {
   });
 
   it('should create a task with default status', () => {
-    const user = User.create(
-      'Test User',
-      faker.internet.email(),
-      faker.internet.password(),
-    );
+    const user = User.create({
+      name: 'Test User',
+      email: faker.internet.email(),
+      password: faker.internet.password(),
+    });
     user.id = 'user-123';
     const task = Task.create({
       title: 'Test Task',
@@ -39,11 +39,11 @@ describe('Task', () => {
   });
 
   it('should throw an error if title is empty', () => {
-    const user = User.create(
-      'Test User',
-      faker.internet.email(),
-      faker.internet.password(),
-    );
+    const user = User.create({
+      name: 'Test User',
+      email: faker.internet.email(),
+      password: faker.internet.password(),
+    });
     user.id = 'user-123';
 
     expect(() => {

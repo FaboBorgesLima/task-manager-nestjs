@@ -16,12 +16,16 @@ import { UserByIdPipe } from '../../user-by-id/user-by-id.pipe';
 import { User } from '../../user/domain/user';
 import { AbstractAuthService } from '../../auth/domain/abstract-auth.service';
 import { TaskServiceInterface } from '../domain/task.service.interface';
-import { TaskCreateInterface } from '../domain/interfaces/task-create.interface';
 import { Task } from '../domain/task';
 import { TaskUpdateDto } from './dto/task-update-dto';
 import { TaskGetFromUserDto } from './dto/task-get-from-user-dto';
 import { TaskAdapter } from '../infra/task-adapter';
+import { TaskCreateDTO } from './dto/task-create-dto';
+import { ApiBearerAuth, ApiOkResponse, ApiParam } from '@nestjs/swagger';
+import { TaskJSON } from '../infra/task-JSON';
+import { TaskListResponseDto } from './dto/task-list-response-dto';
 
+@ApiBearerAuth('Authorization')
 @Controller('tasks')
 export class TaskController {
   public constructor(
@@ -34,6 +38,11 @@ export class TaskController {
   }
 
   @Get('/')
+  @ApiBearerAuth('Authorization')
+  @ApiOkResponse({
+    description: 'The record has been successfully retrieved.',
+    type: TaskListResponseDto,
+  })
   async getCurrentUserTasks(
     @Headers('Authorization') authorization: string,
     @Query() query: TaskGetFromUserDto,
@@ -52,7 +61,12 @@ export class TaskController {
    * @param authorization
    * @returns
    */
+  @ApiParam({ name: 'user', type: String })
   @Get('/users/:user')
+  @ApiOkResponse({
+    description: 'The record has been successfully retrieved.',
+    type: TaskListResponseDto,
+  })
   async getTasksByUser(
     @Param('user', UserByIdPipe) user: User,
     @Headers('Authorization') authorization: string,
@@ -82,6 +96,10 @@ export class TaskController {
   }
 
   @Get('/:task')
+  @ApiOkResponse({
+    description: 'The record has been successfully retrieved.',
+    type: TaskJSON,
+  })
   async getTask(
     @Param('task') taskId: string,
     @Headers('Authorization') authorization: string,
@@ -107,7 +125,7 @@ export class TaskController {
 
   @Post('/')
   async createTask(
-    @Body() taskCreateDTO: TaskCreateInterface,
+    @Body() taskCreateDTO: TaskCreateDTO,
     @Headers('Authorization') authorization: string,
   ) {
     const requestUser = await this.authService.getUserFromHeader(authorization);
@@ -123,6 +141,10 @@ export class TaskController {
     return TaskAdapter.fromDomain(task).toJson();
   }
 
+  @ApiOkResponse({
+    description: 'The record has been successfully updated.',
+    type: TaskJSON,
+  })
   @Put('/:task')
   async updateTask(
     @Param('task') taskId: string,

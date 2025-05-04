@@ -1,40 +1,44 @@
 import { HashMaker } from '../../hash-maker/hash-maker';
+import { UserCreateProps } from './types/user-create-props';
+import { UserProps } from './types/user-props';
 
 export class User {
   public id?: string;
 
-  protected name: string;
+  protected _name: string;
 
-  protected email: string;
+  protected _email: string;
 
-  protected password: string;
+  protected _password: string;
 
   protected createdAt: Date;
   public updatedAt: Date;
 
-  constructor(
-    name: string,
-    email: string,
-    password: string,
-    createdAt: Date = new Date(),
-    updatedAt: Date = new Date(),
-  ) {
+  constructor({
+    id,
+    name,
+    email,
+    password,
+    createdAt = new Date(),
+    updatedAt = new Date(),
+  }: UserProps) {
+    this.id = id;
     if (!name || name.length < 3) {
       throw new Error('Name must be at least 3 characters long');
     }
 
-    this.name = name;
+    this._name = name;
 
     if (!User.isEmail(email)) {
       throw new Error('Invalid email format');
     }
-    this.email = email;
+    this._email = email;
 
     if (!HashMaker.isHash(password)) {
       throw new Error('Password must be a hash');
     }
 
-    this.password = password;
+    this._password = password;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
   }
@@ -43,7 +47,7 @@ export class User {
     return this.createdAt;
   }
 
-  public static create(name: string, email: string, password: string): User {
+  public static create({ name, email, password }: UserCreateProps): User {
     if (!this.isEmail(email)) {
       throw new Error('Invalid email format');
     }
@@ -62,7 +66,13 @@ export class User {
       hashPassword = HashMaker.make(password);
     }
 
-    return new User(name, email, hashPassword);
+    return new User({
+      name,
+      email,
+      password: hashPassword,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
   }
 
   public static isEmail(email: string): boolean {
@@ -71,15 +81,22 @@ export class User {
   }
 
   public canUpdate(user: User): boolean {
-    return this.password === user.password && this.id === user.id;
+    return this.id === user.id;
   }
 
   public canDelete(user: User): boolean {
-    return this.password === user.password && this.id === user.id;
+    return this.id === user.id;
+  }
+
+  public canSee(user: User): boolean {
+    return this.id === user.id;
   }
 
   public getPassword(): string {
-    return this.password;
+    return this._password;
+  }
+  get password(): string {
+    return this._password;
   }
 
   public changePassword(password: string, user: User): void {
@@ -92,43 +109,32 @@ export class User {
       hashPassword = HashMaker.make(password);
     }
 
-    this.password = hashPassword;
+    this._password = hashPassword;
   }
 
   public setName(name: string, user: User): void {
     if (!this.canUpdate(user)) {
       throw new Error('User not authorized to update name');
     }
-    this.name = name;
+    this._name = name;
+  }
+
+  get name(): string {
+    return this._name;
   }
 
   public getName(): string {
-    return this.name;
+    return this._name;
+  }
+  get email(): string {
+    return this._email;
   }
 
   public getEmail(): string {
-    return this.email;
+    return this._email;
   }
 
   public canViewTasks(user: User): boolean {
     return this.id === user.id;
-  }
-
-  public toJSON() {
-    return {
-      id: this.id,
-      createdAt: this.getCreatedAt(),
-      updatedAt: this.updatedAt,
-      password: this.password,
-      name: this.name,
-      email: this.email,
-    };
-  }
-
-  public toJSONProfile() {
-    return {
-      id: this.id,
-      name: this.name,
-    };
   }
 }

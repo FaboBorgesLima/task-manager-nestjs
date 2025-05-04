@@ -45,6 +45,6 @@ export class AuthController {
     if (!user) {
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
-    return user.toJSON();
+    return user;
   }
 }

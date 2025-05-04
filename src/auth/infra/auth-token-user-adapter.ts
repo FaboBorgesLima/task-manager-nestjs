@@ -13,13 +13,13 @@ export class AuthTokenUserAdapter {
   }
 
   public static fromAuthToken(authToken: AuthToken): AuthTokenUserAdapter {
-    const userDomain = new User(
-      authToken.user.name,
-      authToken.user.email,
-      authToken.user.password,
-      authToken.user.createdAt,
-      authToken.user.updatedAt,
-    );
+    const userDomain = new User({
+      name: authToken.user.name,
+      email: authToken.user.email,
+      password: authToken.user.password,
+      createdAt: authToken.user.createdAt,
+      updatedAt: authToken.user.updatedAt,
+    });
 
     userDomain.id = authToken.user.id?.toString();
     return AuthTokenUserAdapter.fromDomain(userDomain);

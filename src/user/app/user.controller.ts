@@ -17,9 +17,11 @@ import { User } from '../domain/user';
 import { UserCreateDto } from './dto/user-create-dto';
 import { UserUpdateDto } from './dto/user-update-dto';
 import { AbstractAuthService } from '../../auth/domain/abstract-auth.service';
+import { HttpUserAdapterInterface } from '../domain/http-user-adapter.interface';
+import { UserByIdPipe } from '../../user-by-id/user-by-id.pipe';
 
 @Controller('users')
-export class UserController {
+export class UserController implements HttpUserAdapterInterface {
   constructor(
     @Inject(forwardRef(() => UserServiceInterface))
     private readonly userService: UserServiceInterface,
@@ -27,22 +29,9 @@ export class UserController {
     private readonly authService: AbstractAuthService,
   ) {}
 
-  @Get('/')
-  public async findAll() {
-    return {
-      users: (await this.userService.findAll()).map((user) =>
-        user.toJSONProfile(),
-      ),
-    };
-  }
-
   @Post('/')
   public async create(@Body() userCreateDto: UserCreateDto) {
-    const user = User.create(
-      userCreateDto.name,
-      userCreateDto.email,
-      userCreateDto.password,
-    );
+    const user = User.create(userCreateDto);
 
     const savedUser = await this.userService.saveOne(user);
 
@@ -50,26 +39,38 @@ export class UserController {
   }
 
   @Get(':id')
-  public async findOne(@Param('id') id: string) {
-    const user = await this.userService.findOne(id);
+  public async findOne(
+    @Param('id') id: string,
+    @Headers('Authorization') authorization: string,
+  ) {
+    const [requestUser, user] = await Promise.all([
+      this.authService.getUserFromHeader(authorization),
+      this.userService.findOne(id),
+    ]);
+    if (!requestUser) {
+      throw new HttpException('Needs auth token', HttpStatus.UNAUTHORIZED);
+    }
 
     if (!user) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
+    if (!requestUser.canSee(user)) {
+      throw new HttpException(
+        'User not authorized to see',
+        HttpStatus.FORBIDDEN,
+      );
+    }
 
-    return user.toJSONProfile();
+    return user;
   }
 
   @Put(':id')
   public async update(
-    @Param('id') id: string,
+    @Param('id', UserByIdPipe) user: User,
     @Body() userUpdateDto: UserUpdateDto,
     @Headers('Authorization') authorization: string,
   ) {
-    const [user, requestUser] = await Promise.all([
-      this.userService.findOne(id),
-      this.authService.getUserFromHeader(authorization),
-    ]);
+    const requestUser = await this.authService.getUserFromHeader(authorization);
 
     if (!requestUser) {
       throw new HttpException('Needs auth token', HttpStatus.UNAUTHORIZED);

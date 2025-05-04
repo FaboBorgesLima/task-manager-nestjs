@@ -14,11 +14,9 @@ export class AuthJwtService extends AbstractAuthService {
   ) {
     super();
   }
-  async toTokenAndUser(
-    user: User,
-  ): Promise<{ token: string; user: ReturnType<User['toJSON']> }> {
+  async toTokenAndUser(user: User): Promise<{ token: string; user: User }> {
     const token = await this.toToken(user);
-    return { token, user: user.toJSON() };
+    return { token, user: user };
   }
 
   async getUserFromToken(token: string): Promise<User | void> {
