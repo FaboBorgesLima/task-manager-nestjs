@@ -9,15 +9,18 @@ import {
   Post,
 } from '@nestjs/common';
 import { AuthLoginDto } from './dto/auth-login.dto';
-import { HashMaker } from '../../hash-maker/hash-maker';
+import { HashService } from '../../hash/app/hash.service';
 import { AbstractAuthService } from '../domain/abstract-auth.service';
+import { AuthHttpAdapter } from '../domain/auth.http-adapter';
+import { HashServiceInterface } from '../../hash/domain/hash.service.interface';
 
 @Controller('auth')
-export class AuthController {
+export class AuthController implements AuthHttpAdapter {
   public constructor(
     @Inject(AbstractAuthService)
     private readonly authService: AbstractAuthService,
-    private readonly hashMaker: HashMaker,
+    @Inject(HashServiceInterface)
+    private readonly hashMaker: HashService,
   ) {}
 
   @Post('/login')
@@ -42,9 +45,11 @@ export class AuthController {
   @Get('/me')
   public async me(@Headers('authorization') authorization: string) {
     const user = await this.authService.getUserFromHeader(authorization);
+
     if (!user) {
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
+
     return user;
   }
 }

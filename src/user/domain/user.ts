@@ -1,6 +1,6 @@
-import { HashMaker } from '../../hash-maker/hash-maker';
 import { UserCreateProps } from './types/user-create-props';
 import { UserProps } from './types/user-props';
+import { HashServiceInterface } from '../../hash/domain/hash.service.interface';
 
 export class User {
   public id?: string;
@@ -22,21 +22,9 @@ export class User {
     createdAt = new Date(),
     updatedAt = new Date(),
   }: UserProps) {
-    this.id = id;
-    if (!name || name.length < 3) {
-      throw new Error('Name must be at least 3 characters long');
-    }
-
     this._name = name;
-
-    if (!User.isEmail(email)) {
-      throw new Error('Invalid email format');
-    }
+    this.id = id;
     this._email = email;
-
-    if (!HashMaker.isHash(password)) {
-      throw new Error('Password must be a hash');
-    }
 
     this._password = password;
     this.createdAt = createdAt;
@@ -47,32 +35,31 @@ export class User {
     return this.createdAt;
   }
 
-  public static create({ name, email, password }: UserCreateProps): User {
+  public static create(
+    { name, email, password }: UserCreateProps,
+    hashService: HashServiceInterface,
+  ): User {
     if (!this.isEmail(email)) {
       throw new Error('Invalid email format');
     }
-
-    let hashPassword = password;
-
-    if (!password) {
-      throw new Error('Password is required');
+    if (!User.isValidPassword(password)) {
+      throw new Error('Invalid password format');
     }
-
-    if (password.length < 8) {
-      throw new Error('Password must be at least 8 characters long');
-    }
-
-    if (!HashMaker.isHash(hashPassword)) {
-      hashPassword = HashMaker.make(password);
+    if (!name || name.length < 3) {
+      throw new Error('Name must be at least 3 characters long');
     }
 
     return new User({
       name,
       email,
-      password: hashPassword,
+      password: hashService.make(password),
       createdAt: new Date(),
       updatedAt: new Date(),
     });
+  }
+
+  public static isValidPassword(password: string): boolean {
+    return password.length >= 6;
   }
 
   public static isEmail(email: string): boolean {
@@ -97,19 +84,6 @@ export class User {
   }
   get password(): string {
     return this._password;
-  }
-
-  public changePassword(password: string, user: User): void {
-    if (!this.canUpdate(user)) {
-      throw new Error('User not authorized to update password');
-    }
-    let hashPassword = password;
-
-    if (!HashMaker.isHash(password)) {
-      hashPassword = HashMaker.make(password);
-    }
-
-    this._password = hashPassword;
   }
 
   public setName(name: string, user: User): void {

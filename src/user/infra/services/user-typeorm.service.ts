@@ -10,7 +10,7 @@ import { UserEntityAdapter } from '../user-entity-adapter';
 export class UserTypeORMService implements UserServiceInterface {
   public constructor(
     @InjectRepository(UserEntity)
-    private userRepository: Repository<UserEntity>,
+    private readonly userRepository: Repository<UserEntity>,
   ) {}
 
   private isBigInt(value: string): boolean {

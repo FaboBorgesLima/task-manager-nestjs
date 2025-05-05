@@ -9,6 +9,7 @@ import { TaskServiceInterface } from '../domain/task.service.interface';
 import { AbstractAuthService } from '../../auth/domain/abstract-auth.service';
 import { AuthIdService } from '../../auth/infra/services/auth-id.service';
 import { TaskMemoryService } from '../infra/services/task-memory.service';
+import { HashMockService } from '../../hash/app/hash-mock.service';
 
 describe('TaskController', () => {
   let controller: TaskController;
@@ -19,11 +20,14 @@ describe('TaskController', () => {
   let token: string;
 
   beforeAll(async () => {
-    user = User.create({
-      name: faker.person.fullName(),
-      email: faker.internet.email(),
-      password: faker.internet.password(),
-    });
+    user = User.create(
+      {
+        name: faker.person.fullName(),
+        email: faker.internet.email(),
+        password: faker.internet.password(),
+      },
+      HashMockService.getInstance(),
+    );
     await userService.saveOne(user);
     token = await authService.toToken(user);
   });

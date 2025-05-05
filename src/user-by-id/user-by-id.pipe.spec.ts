@@ -2,6 +2,7 @@ import { faker } from '@faker-js/faker/.';
 import { User } from '../user/domain/user';
 import { UserMemoryService } from '../user/infra/services/user-memory.service';
 import { UserByIdPipe } from './user-by-id.pipe';
+import { HashMockService } from '../hash/app/hash-mock.service';
 
 describe('UserByIdPipe', () => {
   const userService = new UserMemoryService();
@@ -22,11 +23,14 @@ describe('UserByIdPipe', () => {
   it('should throw an error if user ID is not a string', async () => {
     const pipe = new UserByIdPipe(userService);
     await userService.saveOne(
-      User.create({
-        name: faker.person.fullName(),
-        email: faker.internet.email(),
-        password: faker.internet.password(),
-      }),
+      User.create(
+        {
+          name: faker.person.fullName(),
+          email: faker.internet.email(),
+          password: faker.internet.password(),
+        },
+        HashMockService.getInstance(),
+      ),
     );
     await expect(() =>
       pipe.transform(12345678, {
@@ -41,11 +45,14 @@ describe('UserByIdPipe', () => {
     const pipe = new UserByIdPipe(userService);
 
     const user = await userService.saveOne(
-      User.create({
-        name: faker.person.fullName(),
-        email: faker.internet.email(),
-        password: faker.internet.password(),
-      }),
+      User.create(
+        {
+          name: faker.person.fullName(),
+          email: faker.internet.email(),
+          password: faker.internet.password(),
+        },
+        HashMockService.getInstance(),
+      ),
     );
     const result = await pipe.transform(user.id, {
       type: 'param',

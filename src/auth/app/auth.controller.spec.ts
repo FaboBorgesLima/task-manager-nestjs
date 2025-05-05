@@ -2,11 +2,12 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
 import { UserServiceInterface } from '../../user/domain/user.service';
 import { UserMemoryService } from '../../user/infra/services/user-memory.service';
-import { HashMaker } from '../../hash-maker/hash-maker';
 import { User } from '../../user/domain/user';
 import { AbstractAuthService } from '../domain/abstract-auth.service';
 import { AuthJwtService } from '../infra/services/auth-jwt.service';
 import { JwtModule } from '@nestjs/jwt';
+import { HashMockService } from '../../hash/app/hash-mock.service';
+import { HashServiceInterface } from '../../hash/domain/hash.service.interface';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -23,7 +24,7 @@ describe('AuthController', () => {
           provide: AbstractAuthService,
           useClass: AuthJwtService,
         },
-        HashMaker,
+        { provide: HashServiceInterface, useClass: HashMockService },
       ],
       imports: [
         JwtModule.register({
@@ -50,11 +51,15 @@ describe('AuthController', () => {
       }),
     ).rejects.toThrow();
 
-    const user = User.create({
-      name: 'John Doe',
-      email: 'test@example.com',
-      password: 'password123',
-    });
+    const user = User.create(
+      {
+        name: 'John Doe',
+        email: 'test@example.com',
+        password: 'password123',
+      },
+      HashMockService.getInstance(),
+    );
+
     await userRepository.saveOne(user);
 
     const loggedInUser = await controller.login({
@@ -67,11 +72,14 @@ describe('AuthController', () => {
 
   it('should return user from token', async () => {
     const userRepository = new UserMemoryService();
-    const user = User.create({
-      name: 'John Doe',
-      email: 'test@testeee.com',
-      password: 'password123',
-    });
+    const user = User.create(
+      {
+        name: 'John Doe',
+        email: 'test@testeee.com',
+        password: 'password123',
+      },
+      HashMockService.getInstance(),
+    );
     await userRepository.saveOne(user);
 
     const { token } = await controller.login({

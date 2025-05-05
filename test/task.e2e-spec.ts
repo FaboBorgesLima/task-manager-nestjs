@@ -10,6 +10,7 @@ import * as request from 'supertest';
 import { clearDatabase } from './helpers/clearDatabase';
 import { TaskJSON } from '../src/task/infra/task-JSON';
 import { App } from 'supertest/types';
+import { HashServiceInterface } from 'src/hash/domain/hash.service.interface';
 
 describe('TaskController (e2e)', () => {
   let app: INestApplication<App>;
@@ -17,6 +18,7 @@ describe('TaskController (e2e)', () => {
   let user: User;
   let userService: UserServiceInterface;
   let authService: AbstractAuthService;
+  let hashService: HashServiceInterface;
 
   beforeAll(async () => {
     // Clear the database before all tests
@@ -33,11 +35,15 @@ describe('TaskController (e2e)', () => {
 
     userService = moduleFixture.get<UserServiceInterface>(UserServiceInterface);
     authService = moduleFixture.get<AbstractAuthService>(AbstractAuthService);
-    user = User.create({
-      name: faker.person.fullName(),
-      email: faker.internet.email(),
-      password: faker.internet.password(),
-    });
+    hashService = moduleFixture.get<HashServiceInterface>(HashServiceInterface);
+    user = User.create(
+      {
+        name: faker.person.fullName(),
+        email: faker.internet.email(),
+        password: faker.internet.password(),
+      },
+      hashService,
+    );
 
     user = await userService.saveOne(user);
     token = await authService.toToken(user);

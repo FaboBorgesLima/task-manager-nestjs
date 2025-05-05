@@ -5,6 +5,8 @@ import { UserServiceInterface } from '../domain/user.service';
 import { AbstractAuthService } from '../../auth/domain/abstract-auth.service';
 import { AuthJwtService } from '../../auth/infra/services/auth-jwt.service';
 import { JwtModule } from '@nestjs/jwt';
+import { HashServiceInterface } from '../../hash/domain/hash.service.interface';
+import { HashMockService } from '../../hash/app/hash-mock.service';
 
 describe('UserController', () => {
   let controller: UserController;
@@ -20,6 +22,10 @@ describe('UserController', () => {
         {
           provide: UserServiceInterface,
           useClass: UserMemoryService,
+        },
+        {
+          provide: HashServiceInterface,
+          useClass: HashMockService,
         },
       ],
       imports: [

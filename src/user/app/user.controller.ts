@@ -17,21 +17,24 @@ import { User } from '../domain/user';
 import { UserCreateDto } from './dto/user-create-dto';
 import { UserUpdateDto } from './dto/user-update-dto';
 import { AbstractAuthService } from '../../auth/domain/abstract-auth.service';
-import { HttpUserAdapterInterface } from '../domain/http-user-adapter.interface';
+import { UserHttpAdapter } from '../domain/user.http-adapter';
 import { UserByIdPipe } from '../../user-by-id/user-by-id.pipe';
+import { HashServiceInterface } from '../../hash/domain/hash.service.interface';
 
 @Controller('users')
-export class UserController implements HttpUserAdapterInterface {
+export class UserController implements UserHttpAdapter {
   constructor(
-    @Inject(forwardRef(() => UserServiceInterface))
+    @Inject(UserServiceInterface)
     private readonly userService: UserServiceInterface,
-    @Inject(forwardRef(() => AbstractAuthService))
+    @Inject(AbstractAuthService)
     private readonly authService: AbstractAuthService,
+    @Inject(HashServiceInterface)
+    private readonly hashService: HashServiceInterface,
   ) {}
 
   @Post('/')
   public async create(@Body() userCreateDto: UserCreateDto) {
-    const user = User.create(userCreateDto);
+    const user = User.create(userCreateDto, this.hashService);
 
     const savedUser = await this.userService.saveOne(user);
 
@@ -82,10 +85,6 @@ export class UserController implements HttpUserAdapterInterface {
 
     if (userUpdateDto.name) {
       user.setName(userUpdateDto.name, requestUser);
-    }
-
-    if (userUpdateDto.password) {
-      user.changePassword(userUpdateDto.password, requestUser);
     }
 
     return this.authService.toTokenAndUser(

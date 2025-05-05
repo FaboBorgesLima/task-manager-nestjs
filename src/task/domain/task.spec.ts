@@ -2,6 +2,7 @@ import { faker } from '@faker-js/faker/.';
 import { User } from '../../user/domain/user';
 import { Task } from './task';
 import { TaskStatus } from './task-status.enum';
+import { HashMockService } from '../../hash/app/hash-mock.service';
 
 describe('Task', () => {
   it('should be defined', () => {
@@ -19,11 +20,14 @@ describe('Task', () => {
   });
 
   it('should create a task with default status', () => {
-    const user = User.create({
-      name: 'Test User',
-      email: faker.internet.email(),
-      password: faker.internet.password(),
-    });
+    const user = User.create(
+      {
+        name: 'Test User',
+        email: faker.internet.email(),
+        password: faker.internet.password(),
+      },
+      HashMockService.getInstance(),
+    );
     user.id = 'user-123';
     const task = Task.create({
       title: 'Test Task',
@@ -39,11 +43,14 @@ describe('Task', () => {
   });
 
   it('should throw an error if title is empty', () => {
-    const user = User.create({
-      name: 'Test User',
-      email: faker.internet.email(),
-      password: faker.internet.password(),
-    });
+    const user = User.create(
+      {
+        name: 'Test User',
+        email: faker.internet.email(),
+        password: faker.internet.password(),
+      },
+      HashMockService.getInstance(),
+    );
     user.id = 'user-123';
 
     expect(() => {

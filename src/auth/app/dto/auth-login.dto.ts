@@ -1,7 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsString } from 'class-validator';
+import { AuthLoginProps } from '../../domain/types/auth-login-props';
 
-export class AuthLoginDto {
+export class AuthLoginDto implements AuthLoginProps {
   @ApiProperty({
     description: 'User email address',
     example: 'user@example.com',
