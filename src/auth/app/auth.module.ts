@@ -7,7 +7,7 @@ import { JwtConfigModule } from '../../jwt/jwt-config.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from '../../user/infra/user.entity';
 import { HashServiceInterface } from '../../hash/domain/hash.service.interface';
-import { UserServiceInterface } from '../../user/domain/user.service';
+import { UserServiceInterface } from '../../user/domain/user.service.interface';
 import { UserTypeORMService } from '../../user/infra/services/user-typeorm.service';
 
 @Module({

@@ -1,10 +1,10 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { UserServiceInterface } from '../../domain/user.service';
+import { UserServiceInterface } from '../../domain/user.service.interface';
 import { User } from '../../domain/user';
 import { Repository } from 'typeorm';
 import { UserEntity } from '../user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserEntityAdapter } from '../user-entity-adapter';
+import { UserAdapter } from '../user-adapter';
 
 @Injectable()
 export class UserTypeORMService implements UserServiceInterface {
@@ -36,13 +36,13 @@ export class UserTypeORMService implements UserServiceInterface {
     if (!user) {
       return;
     }
-    return UserEntityAdapter.fromPersistence(user).toDomain();
+    return UserAdapter.fromPersistence(user).toDomain();
   }
 
   async saveOne(user: User): Promise<User> {
-    const userEntity = UserEntityAdapter.fromDomain(user).toPersistence();
+    const userEntity = UserAdapter.fromDomain(user).toPersistence();
     await this.userRepository.save(userEntity);
-    return UserEntityAdapter.fromPersistence(userEntity).toDomain();
+    return UserAdapter.fromPersistence(userEntity).toDomain();
   }
 
   async deleteOne(id: string): Promise<void> {
@@ -55,9 +55,7 @@ export class UserTypeORMService implements UserServiceInterface {
 
   async findAll(): Promise<User[]> {
     const users = await this.userRepository.find();
-    return users.map((user) =>
-      UserEntityAdapter.fromPersistence(user).toDomain(),
-    );
+    return users.map((user) => UserAdapter.fromPersistence(user).toDomain());
   }
 
   async findByEmailPassword(
@@ -73,6 +71,6 @@ export class UserTypeORMService implements UserServiceInterface {
       return;
     }
 
-    return UserEntityAdapter.fromPersistence(user).toDomain();
+    return UserAdapter.fromPersistence(user).toDomain();
   }
 }

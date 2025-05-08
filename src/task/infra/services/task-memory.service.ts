@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { randomUUID } from 'crypto';
-import { Task } from 'src/task/domain/task';
-import { TaskServiceInterface } from 'src/task/domain/task.service.interface';
+import { Task } from '../../domain/task';
+import { TaskServiceInterface } from '../../domain/task.service.interface';
 import { TaskAdapter } from '../task-adapter';
-import { TaskJSON } from '../task-JSON';
+import { TaskResponseDto } from '../../app/dto/task-response-dto';
 
 @Injectable()
 export class TaskMemoryService implements TaskServiceInterface {
@@ -45,7 +45,7 @@ export class TaskMemoryService implements TaskServiceInterface {
   }
 
   async save(task: Task): Promise<Task> {
-    const taskJSON: TaskJSON = {
+    const taskJSON: TaskResponseDto = {
       id: task.id || randomUUID(),
       createdAt: task.createdAt || new Date(),
       updatedAt: task.updatedAt || new Date(),
@@ -62,9 +62,11 @@ export class TaskMemoryService implements TaskServiceInterface {
         TaskMemoryService.tasks[index] = task;
       }
     } else {
-      TaskMemoryService.tasks.push(TaskAdapter.fromJson(taskJSON).toDomain());
+      TaskMemoryService.tasks.push(
+        TaskAdapter.fromResponseDto(taskJSON).toDomain(),
+      );
     }
 
-    return Promise.resolve(TaskAdapter.fromJson(taskJSON).toDomain());
+    return Promise.resolve(TaskAdapter.fromResponseDto(taskJSON).toDomain());
   }
 }

@@ -6,7 +6,7 @@ export interface UserHttpAdapter {
   findOne(id: string, authorization: string): Promise<User | null>;
   create(user: UserCreateProps): Promise<{ user: User; token: string }>;
   update(
-    user: User,
+    userId: string,
     userUpdateProps: UserUpdateProps,
     authorization: string,
   ): Promise<{ user: User; token: string }>;

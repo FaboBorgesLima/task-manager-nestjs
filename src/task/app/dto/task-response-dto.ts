@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { TaskStatus } from '../domain/task-status.enum';
+import { TaskStatus } from '../../domain/task-status.enum';
 
-export class TaskJSON {
+export class TaskResponseDto {
   @ApiProperty({
     description: 'The unique identifier of the task',
     example: '1',
@@ -44,7 +44,7 @@ export class TaskJSON {
   @ApiProperty()
   userId: string;
 
-  constructor(init: Partial<TaskJSON>) {
+  constructor(init: Partial<TaskResponseDto>) {
     Object.assign(this, init);
   }
 }

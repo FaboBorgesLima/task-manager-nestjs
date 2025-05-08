@@ -11,7 +11,7 @@ export class User {
 
   protected _password: string;
 
-  protected createdAt: Date;
+  protected _createdAt: Date;
   public updatedAt: Date;
 
   constructor({
@@ -27,12 +27,16 @@ export class User {
     this._email = email;
 
     this._password = password;
-    this.createdAt = createdAt;
+    this._createdAt = createdAt;
     this.updatedAt = updatedAt;
   }
 
+  get createdAt(): Date {
+    return this._createdAt;
+  }
+
   public getCreatedAt(): Date {
-    return this.createdAt;
+    return this._createdAt;
   }
 
   public static create(

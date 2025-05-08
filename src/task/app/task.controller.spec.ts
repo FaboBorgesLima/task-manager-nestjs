@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TaskController } from './task.controller';
-import { UserServiceInterface } from '../../user/domain/user.service';
+import { UserServiceInterface } from '../../user/domain/user.service.interface';
 import { UserMemoryService } from '../../user/infra/services/user-memory.service';
 import { User } from '../../user/domain/user';
 import { faker } from '@faker-js/faker/.';
@@ -60,7 +60,7 @@ describe('TaskController', () => {
   });
 
   it('should create task', async () => {
-    const task = await controller.createTask(
+    const task = await controller.create(
       {
         title: 'Test Task',
         description: 'This is a test task',
@@ -78,14 +78,21 @@ describe('TaskController', () => {
   });
 
   it('should return tasks for a user', async () => {
-    const tasks = await controller.getTasksByUser(user, `Bearer ${token}`, {});
+    const tasks = await controller.findFromUser(
+      user.id || '',
+      `Bearer ${token}`,
+      {
+        endDate: new Date(),
+        startDate: new Date(),
+      },
+    );
+
     expect(tasks).toBeDefined();
-    expect(tasks).toHaveProperty('tasks');
-    expect(Array.isArray(tasks.tasks)).toBeTruthy();
+    expect(Array.isArray(tasks)).toBeTruthy();
   });
 
   it('should return a task', async () => {
-    const task = await controller.createTask(
+    const task = await controller.create(
       {
         title: 'Test Task',
         description: 'This is a test task',
@@ -96,13 +103,14 @@ describe('TaskController', () => {
       `Bearer ${token}`,
     );
 
-    const taskGet = await controller.getTask(task.id || '', `Bearer ${token}`);
+    const taskGet = await controller.findOne(task.id || '', `Bearer ${token}`);
+
     expect(taskGet).toBeDefined();
     expect(taskGet.id).toBe(task.id);
   });
 
   it('should update a task', async () => {
-    const task = await controller.createTask(
+    const task = await controller.create(
       {
         title: 'Test Task',
         description: 'This is a test task',
@@ -114,7 +122,7 @@ describe('TaskController', () => {
       `Bearer ${token}`,
     );
 
-    const updatedTask = await controller.updateTask(
+    const updatedTask = await controller.update(
       task.id || '',
       {
         title: 'Updated Task',
@@ -130,7 +138,7 @@ describe('TaskController', () => {
   });
 
   it('should delete a task', async () => {
-    const task = await controller.createTask(
+    const task = await controller.create(
       {
         title: 'Test Task',
         description: 'This is a test task',
@@ -140,7 +148,7 @@ describe('TaskController', () => {
       `Bearer ${token}`,
     );
 
-    await controller.deleteTask(task.id || '', `Bearer ${token}`);
+    await controller.delete(task.id || '', `Bearer ${token}`);
 
     const deletedTask = await taskService.findById(task.id || '');
     expect(deletedTask).toBeUndefined();

@@ -5,12 +5,12 @@ import { AppModule } from '../src/app.module';
 import { AbstractAuthService } from '../src/auth/domain/abstract-auth.service';
 import typeormModule from '../src/database/typeorm.module';
 import { User } from '../src/user/domain/user';
-import { UserServiceInterface } from '../src/user/domain/user.service';
+import { UserServiceInterface } from '../src/user/domain/user.service.interface';
 import * as request from 'supertest';
 import { clearDatabase } from './helpers/clearDatabase';
-import { TaskJSON } from '../src/task/infra/task-JSON';
+import { TaskResponseDto } from '../src/task/app/dto/task-response-dto';
 import { App } from 'supertest/types';
-import { HashServiceInterface } from 'src/hash/domain/hash.service.interface';
+import { HashServiceInterface } from '../src/hash/domain/hash.service.interface';
 
 describe('TaskController (e2e)', () => {
   let app: INestApplication<App>;
@@ -72,7 +72,7 @@ describe('TaskController (e2e)', () => {
       .expect(200);
 
     expect(response.body).toBeDefined();
-    expect(response.body).toHaveProperty('tasks');
+    expect(Array.isArray(response.body)).toBe(true);
   });
 
   it('/tasks/:id (GET)', async () => {
@@ -86,7 +86,7 @@ describe('TaskController (e2e)', () => {
       })
       .expect(201);
 
-    const createResponseBody = createResponse.body as TaskJSON;
+    const createResponseBody = createResponse.body as TaskResponseDto;
     const taskId = createResponseBody.id;
 
     const response = await request(app.getHttpServer())
@@ -108,7 +108,7 @@ describe('TaskController (e2e)', () => {
         dueDate: new Date(),
       })
       .expect(201);
-    const createResponseBody = createResponse.body as TaskJSON;
+    const createResponseBody = createResponse.body as TaskResponseDto;
     const taskId = createResponseBody.id;
     const response = await request(app.getHttpServer())
       .put(`/tasks/${taskId}`)
@@ -141,7 +141,7 @@ describe('TaskController (e2e)', () => {
         dueDate: new Date(),
       })
       .expect(201);
-    const createResponseBody = createResponse.body as TaskJSON;
+    const createResponseBody = createResponse.body as TaskResponseDto;
     const taskId = createResponseBody.id;
 
     const response = await request(app.getHttpServer())

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { User } from '../../domain/user';
-import { UserServiceInterface } from '../../domain/user.service';
+import { UserServiceInterface } from '../../domain/user.service.interface';
 import { randomUUID } from 'crypto';
 
 @Injectable()

@@ -1,4 +1,4 @@
-import { TaskServiceInterface } from 'src/task/domain/task.service.interface';
+import { TaskServiceInterface } from '../../domain/task.service.interface';
 import { TaskEntity } from '../task.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Between, Repository } from 'typeorm';

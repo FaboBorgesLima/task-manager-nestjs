@@ -7,12 +7,15 @@ import {
   HttpStatus,
   Inject,
   Post,
+  UseInterceptors,
 } from '@nestjs/common';
 import { AuthLoginDto } from './dto/auth-login.dto';
 import { HashService } from '../../hash/app/hash.service';
 import { AbstractAuthService } from '../domain/abstract-auth.service';
 import { AuthHttpAdapter } from '../domain/auth.http-adapter';
 import { HashServiceInterface } from '../../hash/domain/hash.service.interface';
+import { UserTokenResponseInterceptor } from '../../user/app/interceptors/user-token-reponse.interceptor';
+import { UserResponseInterceptor } from '../../user/app/interceptors/user-response.interceptor';
 
 @Controller('auth')
 export class AuthController implements AuthHttpAdapter {
@@ -24,6 +27,7 @@ export class AuthController implements AuthHttpAdapter {
   ) {}
 
   @Post('/login')
+  @UseInterceptors(UserTokenResponseInterceptor)
   public async login(@Body() body: AuthLoginDto) {
     const { email, password } = body;
 
@@ -42,10 +46,10 @@ export class AuthController implements AuthHttpAdapter {
     return this.authService.toTokenAndUser(user);
   }
 
+  @UseInterceptors(UserResponseInterceptor)
   @Get('/me')
   public async me(@Headers('authorization') authorization: string) {
     const user = await this.authService.getUserFromHeader(authorization);
-
     if (!user) {
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }

@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { AbstractAuthService } from '../../domain/abstract-auth.service';
-import { UserServiceInterface } from '../../../user/domain/user.service';
+import { UserServiceInterface } from '../../../user/domain/user.service.interface';
 import { User } from '../../../user/domain/user';
 
 /**

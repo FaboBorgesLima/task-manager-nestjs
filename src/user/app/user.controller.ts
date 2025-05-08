@@ -2,7 +2,6 @@ import {
   Body,
   Controller,
   Delete,
-  forwardRef,
   Get,
   Headers,
   HttpException,
@@ -11,15 +10,26 @@ import {
   Param,
   Post,
   Put,
+  UseInterceptors,
 } from '@nestjs/common';
-import { UserServiceInterface } from '../domain/user.service';
+import { UserServiceInterface } from '../domain/user.service.interface';
 import { User } from '../domain/user';
 import { UserCreateDto } from './dto/user-create-dto';
 import { UserUpdateDto } from './dto/user-update-dto';
 import { AbstractAuthService } from '../../auth/domain/abstract-auth.service';
-import { UserHttpAdapter } from '../domain/user.http-adapter';
+import { UserHttpAdapter } from '../domain/user.http.adapter';
 import { UserByIdPipe } from '../../user-by-id/user-by-id.pipe';
 import { HashServiceInterface } from '../../hash/domain/hash.service.interface';
+import {
+  ApiBodyUserResponseInterceptor,
+  UserResponseInterceptor,
+} from './interceptors/user-response.interceptor';
+import { ApiBody, ApiParam } from '@nestjs/swagger';
+import { UserResponseDto } from './dto/user-response-dto';
+import {
+  ApiBodyUserTokenResponseInterceptor,
+  UserTokenResponseInterceptor,
+} from './interceptors/user-token-reponse.interceptor';
 
 @Controller('users')
 export class UserController implements UserHttpAdapter {
@@ -32,6 +42,11 @@ export class UserController implements UserHttpAdapter {
     private readonly hashService: HashServiceInterface,
   ) {}
 
+  @ApiBody({
+    description: 'Create a new user',
+    type: ApiBodyUserTokenResponseInterceptor,
+  })
+  @UseInterceptors(UserTokenResponseInterceptor)
   @Post('/')
   public async create(@Body() userCreateDto: UserCreateDto) {
     const user = User.create(userCreateDto, this.hashService);
@@ -42,6 +57,11 @@ export class UserController implements UserHttpAdapter {
   }
 
   @Get(':id')
+  @ApiBody({
+    description: 'Get user by ID',
+    type: ApiBodyUserResponseInterceptor,
+  })
+  @UseInterceptors(UserResponseInterceptor)
   public async findOne(
     @Param('id') id: string,
     @Headers('Authorization') authorization: string,
@@ -67,13 +87,27 @@ export class UserController implements UserHttpAdapter {
     return user;
   }
 
+  @ApiParam({
+    name: 'id',
+    description: 'User ID',
+    required: true,
+    type: String,
+  })
+  @ApiBody({
+    description: 'Update user by ID',
+    type: ApiBodyUserTokenResponseInterceptor,
+  })
+  @UseInterceptors(UserTokenResponseInterceptor)
   @Put(':id')
   public async update(
-    @Param('id', UserByIdPipe) user: User,
+    @Param('id') userId: string,
     @Body() userUpdateDto: UserUpdateDto,
     @Headers('Authorization') authorization: string,
   ) {
-    const requestUser = await this.authService.getUserFromHeader(authorization);
+    const [requestUser, user] = await Promise.all([
+      this.authService.getUserFromHeader(authorization),
+      this.userService.findOne(userId),
+    ]);
 
     if (!requestUser) {
       throw new HttpException('Needs auth token', HttpStatus.UNAUTHORIZED);

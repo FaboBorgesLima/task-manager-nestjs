@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserController } from './user.controller';
 import { UserMemoryService } from '../infra/services/user-memory.service';
-import { UserServiceInterface } from '../domain/user.service';
+import { UserServiceInterface } from '../domain/user.service.interface';
 import { AbstractAuthService } from '../../auth/domain/abstract-auth.service';
 import { AuthJwtService } from '../../auth/infra/services/auth-jwt.service';
 import { JwtModule } from '@nestjs/jwt';
@@ -92,7 +92,7 @@ describe('UserController', () => {
     });
 
     const updateResponse = await controller.update(
-      user,
+      user.id as string,
       {
         name: 'Jane Doe',
         password: 'newpassword123',

@@ -1,18 +1,33 @@
+import { UserResponseDto } from '../app/dto/user-response-dto';
 import { User } from '../domain/user';
 import { UserEntity } from './user.entity';
 
-export class UserEntityAdapter {
+export class UserAdapter {
   protected constructor(protected user: User) {}
 
-  public static fromDomain(user: User): UserEntityAdapter {
-    return new UserEntityAdapter(user);
+  public static fromDomain(user: User): UserAdapter {
+    return new UserAdapter(user);
   }
 
   public toDomain(): User {
     return this.user;
   }
 
-  public static fromPersistence(user: UserEntity): UserEntityAdapter {
+  public toResponseDTO(): UserResponseDto {
+    if (!this.user.id) {
+      throw new Error('User ID is not set');
+    }
+
+    return {
+      id: this.user.id,
+      name: this.user.name,
+      email: this.user.email,
+      createdAt: this.user.createdAt,
+      updatedAt: this.user.updatedAt,
+    };
+  }
+
+  public static fromPersistence(user: UserEntity): UserAdapter {
     const userDomain = new User({
       name: user.name,
       email: user.email,
@@ -22,7 +37,7 @@ export class UserEntityAdapter {
     });
 
     userDomain.id = user.id?.toString();
-    return UserEntityAdapter.fromDomain(userDomain);
+    return UserAdapter.fromDomain(userDomain);
   }
 
   public toPersistence(): UserEntity {

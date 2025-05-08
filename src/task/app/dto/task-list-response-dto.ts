@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { TaskJSON } from '../../infra/task-JSON';
+import { TaskResponseDto } from './task-response-dto';
 
 export class TaskListResponseDto {
-  @ApiProperty({ type: [TaskJSON] })
-  tasks: TaskJSON[];
+  @ApiProperty({ type: [TaskResponseDto] })
+  tasks: TaskResponseDto[];
 }

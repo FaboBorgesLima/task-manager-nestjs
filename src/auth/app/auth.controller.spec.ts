@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
-import { UserServiceInterface } from '../../user/domain/user.service';
+import { UserServiceInterface } from '../../user/domain/user.service.interface';
 import { UserMemoryService } from '../../user/infra/services/user-memory.service';
 import { User } from '../../user/domain/user';
 import { AbstractAuthService } from '../domain/abstract-auth.service';
