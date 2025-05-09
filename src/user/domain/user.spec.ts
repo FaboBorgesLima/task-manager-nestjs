@@ -1,5 +1,4 @@
 import { faker } from '@faker-js/faker/.';
-import { HashService } from '../../hash/app/hash.service';
 import { User } from './user';
 import { HashMockService } from '../../hash/app/hash-mock.service';
 
@@ -43,7 +42,6 @@ describe('User', () => {
     }).toThrow();
   });
   it('should throw an error if password is invalid', () => {
-    const hash = new HashService();
     expect(() => {
       User.create(
         {

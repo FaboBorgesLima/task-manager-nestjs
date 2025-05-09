@@ -18,14 +18,12 @@ import { UserCreateDto } from './dto/user-create-dto';
 import { UserUpdateDto } from './dto/user-update-dto';
 import { AbstractAuthService } from '../../auth/domain/abstract-auth.service';
 import { UserHttpAdapter } from '../domain/user.http.adapter';
-import { UserByIdPipe } from '../../user-by-id/user-by-id.pipe';
 import { HashServiceInterface } from '../../hash/domain/hash.service.interface';
 import {
   ApiBodyUserResponseInterceptor,
   UserResponseInterceptor,
 } from './interceptors/user-response.interceptor';
 import { ApiBody, ApiParam } from '@nestjs/swagger';
-import { UserResponseDto } from './dto/user-response-dto';
 import {
   ApiBodyUserTokenResponseInterceptor,
   UserTokenResponseInterceptor,
