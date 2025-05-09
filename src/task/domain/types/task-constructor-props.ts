@@ -1,6 +1,6 @@
 import { TaskStatus } from '../task-status.enum';
 
-export interface TaskConstructorInterface {
+export type TaskConstructorProps = {
   id?: string;
   title: string;
   userId: string;
@@ -9,4 +9,4 @@ export interface TaskConstructorInterface {
   createdAt: Date;
   updatedAt: Date;
   dueDate: Date;
-}
+};

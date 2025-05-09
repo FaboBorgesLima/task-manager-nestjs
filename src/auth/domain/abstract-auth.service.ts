@@ -32,7 +32,5 @@ export abstract class AbstractAuthService {
   ): Promise<User | void>;
   abstract getUserFromToken(token: string): Promise<User | void>;
   abstract toToken(user: User): Promise<string>;
-  abstract toTokenAndUser(
-    user: User,
-  ): Promise<{ token: string; user: ReturnType<User['toJSON']> }>;
+  abstract toTokenAndUser(user: User): Promise<{ token: string; user: User }>;
 }

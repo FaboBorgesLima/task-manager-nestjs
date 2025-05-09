@@ -1,5 +1,5 @@
 import { Task } from '../domain/task';
-import { TaskJSON } from './task-JSON';
+import { TaskResponseDto } from '../app/dto/task-response-dto';
 import { TaskEntity } from './task.entity';
 
 export class TaskAdapter {
@@ -24,7 +24,7 @@ export class TaskAdapter {
     return this.task;
   }
 
-  public toJson(): TaskJSON {
+  public toResponseDto(): TaskResponseDto {
     if (!this.task.id) {
       throw new Error('Task ID is not defined');
     }
@@ -41,7 +41,7 @@ export class TaskAdapter {
     };
   }
 
-  public static fromJson(json: TaskJSON): TaskAdapter {
+  public static fromResponseDto(json: TaskResponseDto): TaskAdapter {
     return new TaskAdapter(
       new Task({
         id: json.id,

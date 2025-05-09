@@ -1,32 +1,56 @@
-import { HashMaker } from '../../hash-maker/hash-maker';
+import { faker } from '@faker-js/faker/.';
 import { User } from './user';
+import { HashMockService } from '../../hash/app/hash-mock.service';
 
 describe('User', () => {
+  const hashService = HashMockService.getInstance();
   it('should be defined', () => {
-    const hash = new HashMaker();
     expect(
-      new User('name', 'email@email.com', hash.make('password')),
+      new User({
+        name: 'name',
+        email: 'email@email.com',
+        password: faker.internet.password(),
+      }),
     ).toBeDefined();
   });
+
   it('should create a user', () => {
-    const hash = new HashMaker();
-    const user = User.create('name', 'email@email.com', hash.make('password'));
+    const user = User.create(
+      {
+        name: 'name',
+        email: 'email@email.com',
+        password: faker.internet.password(),
+      },
+      hashService,
+    );
     expect(user).toBeDefined();
     expect(user.id).toBeUndefined();
     expect(user.getEmail()).toEqual('email@email.com');
     expect(user.getName()).toEqual('name');
-    expect(user.getPassword()).not.toEqual('password');
-    expect(user.getPassword()).toEqual(hash.make('password'));
   });
+
   it('should throw an error if email is invalid', () => {
-    const hash = new HashMaker();
     expect(() => {
-      new User('name', 'invalid-email', hash.make('password'));
+      User.create(
+        {
+          name: 'name',
+          email: 'invalid-email',
+          password: 'password',
+        },
+        hashService,
+      );
     }).toThrow();
   });
-  it('should throw an error if password is not a hash', () => {
+  it('should throw an error if password is invalid', () => {
     expect(() => {
-      new User('name', 'email@email.com', 'not-a-hash');
+      User.create(
+        {
+          name: 'name',
+          email: 'email@email.com',
+          password: 'short',
+        },
+        hashService,
+      );
     }).toThrow();
   });
 });

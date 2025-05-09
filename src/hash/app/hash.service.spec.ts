@@ -1,25 +1,27 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { HashMaker } from './hash-maker';
+import { HashService } from './hash.service';
 
 describe('Hash', () => {
-  let provider: HashMaker;
+  let provider: HashService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [HashMaker],
+      providers: [HashService],
     }).compile();
 
-    provider = module.get<HashMaker>(HashMaker);
+    provider = module.get<HashService>(HashService);
   });
 
   it('should be defined', () => {
     expect(provider).toBeDefined();
   });
+
   it('should hash a password', () => {
     const password = 'password';
     const hashedPassword = provider.make(password);
     expect(hashedPassword).not.toEqual(password);
   });
+
   it('should make the same hash', () => {
     const password = 'password';
     const hashedPassword1 = provider.make(password);

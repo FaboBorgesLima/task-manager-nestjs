@@ -1,7 +1,7 @@
 import { User } from '../../user/domain/user';
-import { TaskConstructorInterface } from './interfaces/task-constructor.interface';
-import { TaskCreateInterface } from './interfaces/task-create.interface';
-import { TaskUpdateInterface } from './interfaces/task-update.interface';
+import { TaskConstructorProps } from './types/task-constructor-props';
+import { TaskCreateProps } from './types/task-create-props';
+import { TaskUpdateProps } from './types/task-update-props';
 import { TaskStatus } from './task-status.enum';
 
 export class Task {
@@ -14,7 +14,7 @@ export class Task {
   protected _updatedAt: Date;
   protected _userId: string;
 
-  constructor(params: TaskConstructorInterface) {
+  constructor(params: TaskConstructorProps) {
     this._id = params.id;
 
     if (!Task.isTitleValid(params.title)) {
@@ -95,7 +95,7 @@ export class Task {
     userId,
     status = TaskStatus.PENDING,
     dueDate,
-  }: TaskCreateInterface): Task {
+  }: TaskCreateProps): Task {
     if (!this.isTitleValid(title)) {
       throw new Error('Title must be at least 3 characters long');
     }
@@ -140,7 +140,7 @@ export class Task {
     description,
     status,
     dueDate,
-  }: TaskUpdateInterface): void {
+  }: TaskUpdateProps): void {
     if (title) {
       if (!Task.isTitleValid(title)) {
         throw new Error('Title must be at least 3 characters long');

@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { AbstractAuthService } from '../../domain/abstract-auth.service';
-import { UserServiceInterface } from '../../../user/domain/user.service';
+import { UserServiceInterface } from '../../../user/domain/user.service.interface';
 import { User } from '../../../user/domain/user';
 import { JwtService } from '@nestjs/jwt';
 import { AuthTokenUserAdapter } from '../auth-token-user-adapter';
@@ -14,11 +14,9 @@ export class AuthJwtService extends AbstractAuthService {
   ) {
     super();
   }
-  async toTokenAndUser(
-    user: User,
-  ): Promise<{ token: string; user: ReturnType<User['toJSON']> }> {
+  async toTokenAndUser(user: User): Promise<{ token: string; user: User }> {
     const token = await this.toToken(user);
-    return { token, user: user.toJSON() };
+    return { token, user: user };
   }
 
   async getUserFromToken(token: string): Promise<User | void> {

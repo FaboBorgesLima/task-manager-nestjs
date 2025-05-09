@@ -11,39 +11,53 @@ import {
   Put,
   Query,
   UnauthorizedException,
+  UseInterceptors,
 } from '@nestjs/common';
-import { UserByIdPipe } from '../../user-by-id/user-by-id.pipe';
-import { User } from '../../user/domain/user';
 import { AbstractAuthService } from '../../auth/domain/abstract-auth.service';
 import { TaskServiceInterface } from '../domain/task.service.interface';
-import { TaskCreateInterface } from '../domain/interfaces/task-create.interface';
 import { Task } from '../domain/task';
 import { TaskUpdateDto } from './dto/task-update-dto';
-import { TaskGetFromUserDto } from './dto/task-get-from-user-dto';
-import { TaskAdapter } from '../infra/task-adapter';
+import { TaskCreateDTO } from './dto/task-create-dto';
+import { ApiBearerAuth, ApiOkResponse, ApiParam } from '@nestjs/swagger';
+import { TaskResponseDto } from './dto/task-response-dto';
+import { TaskListResponseDto } from './dto/task-list-response-dto';
+import { TaskHttpAdapter } from '../domain/task.http.adapter';
+import { DateRangeDto } from '../../types/app/date-range-dto';
+import { UserServiceInterface } from '../../user/domain/user.service.interface';
+import { TaskResponseInterceptor } from './interceptors/task-response.interceptor';
+import { TaskListResponseInterceptor } from './interceptors/task-list-response.interceptor';
 
+@ApiBearerAuth('Authorization')
 @Controller('tasks')
-export class TaskController {
+export class TaskController implements TaskHttpAdapter {
   public constructor(
     @Inject(AbstractAuthService)
     private readonly authService: AbstractAuthService,
     @Inject(TaskServiceInterface)
     private readonly taskService: TaskServiceInterface,
+    @Inject(UserServiceInterface)
+    private readonly userService: UserServiceInterface,
   ) {
     // Constructor logic if needed
   }
 
   @Get('/')
-  async getCurrentUserTasks(
+  @ApiBearerAuth('Authorization')
+  @UseInterceptors(TaskListResponseInterceptor)
+  @ApiOkResponse({
+    description: 'The record has been successfully retrieved.',
+    type: TaskListResponseDto,
+  })
+  async findFromCurrentUser(
     @Headers('Authorization') authorization: string,
-    @Query() query: TaskGetFromUserDto,
+    @Query() query: DateRangeDto,
   ) {
     const requestUser = await this.authService.getUserFromHeader(authorization);
     if (!requestUser) {
       throw new UnauthorizedException('User not found');
     }
 
-    return this.getTasksByUser(requestUser, authorization, query);
+    return this.findFromUser(requestUser.id || '', authorization, query);
   }
 
   /**
@@ -52,15 +66,24 @@ export class TaskController {
    * @param authorization
    * @returns
    */
+  @ApiParam({ name: 'user', type: String })
   @Get('/users/:user')
-  async getTasksByUser(
-    @Param('user', UserByIdPipe) user: User,
+  @UseInterceptors(TaskListResponseInterceptor)
+  @ApiOkResponse({
+    description: 'The record has been successfully retrieved.',
+    type: TaskListResponseDto,
+  })
+  async findFromUser(
+    @Param('user') userId: string,
     @Headers('Authorization') authorization: string,
-    @Query() query: TaskGetFromUserDto,
+    @Query() range: DateRangeDto,
   ) {
-    const requestUser = await this.authService.getUserFromHeader(authorization);
+    const [requestUser, user] = await Promise.all([
+      this.authService.getUserFromHeader(authorization),
+      this.userService.findOne(userId),
+    ]);
 
-    if (!requestUser || !user.id) {
+    if (!requestUser || !user) {
       throw new UnauthorizedException('User not found');
     }
 
@@ -68,21 +91,24 @@ export class TaskController {
       throw new UnauthorizedException('User cannot view tasks for this user');
     }
 
-    const tasks = query.range
+    const tasks = range
       ? await this.taskService.findByUserAndDate(
-          user.id || '',
-          query.range.startDate,
-          query.range.endDate,
+          userId,
+          range.startDate,
+          range.endDate,
         )
-      : await this.taskService.findByUser(user.id);
+      : await this.taskService.findByUser(userId);
 
-    return {
-      tasks: tasks.map((task) => TaskAdapter.fromDomain(task).toJson()),
-    };
+    return tasks;
   }
 
   @Get('/:task')
-  async getTask(
+  @UseInterceptors(TaskResponseInterceptor)
+  @ApiOkResponse({
+    description: 'The record has been successfully retrieved.',
+    type: TaskResponseDto,
+  })
+  async findOne(
     @Param('task') taskId: string,
     @Headers('Authorization') authorization: string,
   ) {
@@ -102,12 +128,13 @@ export class TaskController {
       throw new UnauthorizedException('User cannot view this task');
     }
 
-    return TaskAdapter.fromDomain(task).toJson();
+    return task;
   }
 
   @Post('/')
-  async createTask(
-    @Body() taskCreateDTO: TaskCreateInterface,
+  @UseInterceptors(TaskResponseInterceptor)
+  async create(
+    @Body() taskCreateDTO: TaskCreateDTO,
     @Headers('Authorization') authorization: string,
   ) {
     const requestUser = await this.authService.getUserFromHeader(authorization);
@@ -120,11 +147,16 @@ export class TaskController {
 
     const task = await this.taskService.save(Task.create(taskCreateDTO));
 
-    return TaskAdapter.fromDomain(task).toJson();
+    return task;
   }
 
+  @ApiOkResponse({
+    description: 'The record has been successfully updated.',
+    type: TaskResponseDto,
+  })
   @Put('/:task')
-  async updateTask(
+  @UseInterceptors(TaskResponseInterceptor)
+  async update(
     @Param('task') taskId: string,
     @Body() taskUpdateDTO: TaskUpdateDto,
     @Headers('Authorization') authorization: string,
@@ -153,11 +185,11 @@ export class TaskController {
 
     task = await this.taskService.save(task);
 
-    return TaskAdapter.fromDomain(task).toJson();
+    return task;
   }
 
   @Delete('/:task')
-  async deleteTask(
+  async delete(
     @Param('task') taskId: string,
     @Headers('Authorization') authorization: string,
   ) {

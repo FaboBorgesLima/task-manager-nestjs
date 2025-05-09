@@ -35,29 +35,6 @@ describe('UserController (e2e)', () => {
     expect(response.body).toHaveProperty('token');
   });
 
-  it('/users (GET)', async () => {
-    let response = await request(app.getHttpServer()).get('/users').expect(200);
-
-    expect(response.body).toHaveProperty('users');
-
-    await request(app.getHttpServer())
-      .post('/users')
-      .send({
-        name: faker.person.fullName(),
-        email: faker.internet.email(),
-        password: 'password123',
-      })
-      .expect(201);
-
-    response = await request(app.getHttpServer()).get('/users').expect(200);
-    expect(response.body).toHaveProperty('users[0].name');
-
-    const body = response.body as {
-      users: ReturnType<User['toJSONProfile']>[];
-    };
-    expect(body.users.length).toBeGreaterThanOrEqual(1);
-  });
-
   it('/users/:id (GET)', async () => {
     const name = faker.person.fullName();
     const createResponse = await request(app.getHttpServer())
@@ -69,17 +46,19 @@ describe('UserController (e2e)', () => {
       })
       .expect(201);
 
-    const user = (
-      createResponse.body as { user: ReturnType<User['toJSONProfile']> }
-    ).user;
+    const { user, token } = createResponse.body as {
+      user: User;
+      token: string;
+    };
     const userId = user.id;
 
     const response = await request(app.getHttpServer())
       .get(`/users/${userId}`)
+      .set('Authorization', `Bearer ${token}`)
       .expect(200);
     expect(response.body).toHaveProperty('name', name);
     expect(response.body).toHaveProperty('id', userId);
-    expect(response.body).not.toHaveProperty('email');
+    expect(response.body).toHaveProperty('email');
     expect(response.body).not.toHaveProperty('password');
     expect(response.body).not.toHaveProperty('token');
 
@@ -98,7 +77,7 @@ describe('UserController (e2e)', () => {
       })
       .expect(201);
     const { user, token } = createResponse.body as {
-      user: ReturnType<User['toJSONProfile']>;
+      user: User;
       token: string;
     };
 
@@ -126,7 +105,7 @@ describe('UserController (e2e)', () => {
       })
       .expect(201);
     const { user, token } = createResponse.body as {
-      user: ReturnType<User['toJSONProfile']>;
+      user: User;
       token: string;
     };
     const userId = user.id;
@@ -137,7 +116,7 @@ describe('UserController (e2e)', () => {
 
     await request(app.getHttpServer())
       .get(`/users/${userId}`)
-      .expect(HttpStatus.NOT_FOUND);
+      .expect(HttpStatus.BAD_REQUEST);
   });
 
   afterEach(async () => {

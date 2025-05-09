@@ -1,10 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserController } from './user.controller';
 import { UserMemoryService } from '../infra/services/user-memory.service';
-import { UserServiceInterface } from '../domain/user.service';
+import { UserServiceInterface } from '../domain/user.service.interface';
 import { AbstractAuthService } from '../../auth/domain/abstract-auth.service';
 import { AuthJwtService } from '../../auth/infra/services/auth-jwt.service';
 import { JwtModule } from '@nestjs/jwt';
+import { HashServiceInterface } from '../../hash/domain/hash.service.interface';
+import { HashMockService } from '../../hash/app/hash-mock.service';
 
 describe('UserController', () => {
   let controller: UserController;
@@ -20,6 +22,10 @@ describe('UserController', () => {
         {
           provide: UserServiceInterface,
           useClass: UserMemoryService,
+        },
+        {
+          provide: HashServiceInterface,
+          useClass: HashMockService,
         },
       ],
       imports: [
@@ -54,34 +60,28 @@ describe('UserController', () => {
     expect(user.id).toBeDefined();
   });
 
-  it('should find all users', async () => {
-    await controller.create({
-      name: 'John Doe',
-      email: 'john.doe@example.com',
-      password: 'password123',
-    });
-    const users = await controller.findAll();
-    expect(users).toBeDefined();
-    expect(users.users.length).toBeGreaterThanOrEqual(1);
-  });
-
   it('should find a user by id', async () => {
-    await controller.create({
+    const { user, token } = await controller.create({
       name: 'John Doe',
       email: 'john.doe@example.com',
       password: 'password123',
     });
-
-    const { users } = await controller.findAll();
-    const userId = users[0].id as string;
-    const user = await controller.findOne(userId);
 
     if (!user) {
       throw new Error('User not found');
     }
 
-    expect(user).toBeDefined();
-    expect(user.id).toBe(users[0].id as string);
+    const foundUser = await controller.findOne(
+      user.id as string,
+      `Bearer ${token}`,
+    );
+
+    if (!foundUser) {
+      throw new Error('User not found');
+    }
+
+    expect(foundUser).toBeDefined();
+    expect(foundUser.id).toBe(user.id as string);
   });
 
   it('should update a user', async () => {
@@ -91,10 +91,8 @@ describe('UserController', () => {
       password: 'password123',
     });
 
-    const userId = user.id as string;
-
     const updateResponse = await controller.update(
-      userId,
+      user.id as string,
       {
         name: 'Jane Doe',
         password: 'newpassword123',
