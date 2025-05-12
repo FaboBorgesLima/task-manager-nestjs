@@ -22,9 +22,7 @@ import { UserResponseInterceptor } from '../../user/app/interceptors/user-respon
 import {
   ApiBearerAuth,
   ApiBody,
-  ApiHeader,
   ApiHeaders,
-  ApiHideProperty,
   ApiResponse,
 } from '@nestjs/swagger';
 
