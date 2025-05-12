@@ -23,11 +23,12 @@ import {
   ApiBodyUserResponseInterceptor,
   UserResponseInterceptor,
 } from './interceptors/user-response.interceptor';
-import { ApiBody, ApiParam } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiParam, ApiResponse } from '@nestjs/swagger';
 import {
   ApiBodyUserTokenResponseInterceptor,
   UserTokenResponseInterceptor,
 } from './interceptors/user-token-reponse.interceptor';
+import { BigIntPipe } from '../../big-int/big-int.pipe';
 
 @Controller('users')
 export class UserController implements UserHttpAdapter {
@@ -42,6 +43,11 @@ export class UserController implements UserHttpAdapter {
 
   @ApiBody({
     description: 'Create a new user',
+    type: UserCreateDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'User created successfully',
     type: ApiBodyUserTokenResponseInterceptor,
   })
   @UseInterceptors(UserTokenResponseInterceptor)
@@ -55,13 +61,21 @@ export class UserController implements UserHttpAdapter {
   }
 
   @Get(':id')
-  @ApiBody({
-    description: 'Get user by ID',
+  @ApiParam({
+    name: 'id',
+    description: 'User ID',
+    required: true,
+    type: String,
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'User retrieved successfully',
     type: ApiBodyUserResponseInterceptor,
   })
+  @ApiBearerAuth()
   @UseInterceptors(UserResponseInterceptor)
   public async findOne(
-    @Param('id') id: string,
+    @Param('id', BigIntPipe) id: string,
     @Headers('Authorization') authorization: string,
   ) {
     const [requestUser, user] = await Promise.all([
@@ -93,12 +107,18 @@ export class UserController implements UserHttpAdapter {
   })
   @ApiBody({
     description: 'Update user by ID',
+    type: UserUpdateDto,
+  })
+  @ApiBearerAuth()
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'User updated successfully',
     type: ApiBodyUserTokenResponseInterceptor,
   })
   @UseInterceptors(UserTokenResponseInterceptor)
   @Put(':id')
   public async update(
-    @Param('id') userId: string,
+    @Param('id', BigIntPipe) userId: string,
     @Body() userUpdateDto: UserUpdateDto,
     @Headers('Authorization') authorization: string,
   ) {
@@ -124,9 +144,16 @@ export class UserController implements UserHttpAdapter {
     );
   }
 
+  @ApiParam({
+    name: 'id',
+    description: 'User ID',
+    required: true,
+    type: String,
+  })
+  @ApiBearerAuth()
   @Delete(':id')
   public async delete(
-    @Param('id') id: string,
+    @Param('id', BigIntPipe) id: string,
     @Headers('Authorization') authorization: string,
   ) {
     const [requestUser, user] = await Promise.all([

@@ -15,7 +15,7 @@ describe('BigIntPipe', () => {
     } as unknown as ArgumentMetadata;
 
     expect(pipe.transform('12345678901234567890', metadata)).toEqual(
-      BigInt('12345678901234567890'),
+      '12345678901234567890',
     );
 
     expect(() => {
