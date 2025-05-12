@@ -14,8 +14,19 @@ import { HashService } from '../../hash/app/hash.service';
 import { AbstractAuthService } from '../domain/abstract-auth.service';
 import { AuthHttpAdapter } from '../domain/auth.http-adapter';
 import { HashServiceInterface } from '../../hash/domain/hash.service.interface';
-import { UserTokenResponseInterceptor } from '../../user/app/interceptors/user-token-reponse.interceptor';
+import {
+  ApiBodyUserTokenResponseInterceptor,
+  UserTokenResponseInterceptor,
+} from '../../user/app/interceptors/user-token-reponse.interceptor';
 import { UserResponseInterceptor } from '../../user/app/interceptors/user-response.interceptor';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiHeader,
+  ApiHeaders,
+  ApiHideProperty,
+  ApiResponse,
+} from '@nestjs/swagger';
 
 @Controller('auth')
 export class AuthController implements AuthHttpAdapter {
@@ -28,6 +39,15 @@ export class AuthController implements AuthHttpAdapter {
 
   @Post('/login')
   @UseInterceptors(UserTokenResponseInterceptor)
+  @ApiBody({
+    description: 'Login user',
+    type: AuthLoginDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'User logged in successfully',
+    type: ApiBodyUserTokenResponseInterceptor,
+  })
   public async login(@Body() body: AuthLoginDto) {
     const { email, password } = body;
 
@@ -48,7 +68,24 @@ export class AuthController implements AuthHttpAdapter {
 
   @UseInterceptors(UserResponseInterceptor)
   @Get('/me')
-  public async me(@Headers('authorization') authorization: string) {
+  @ApiBearerAuth()
+  @ApiHeaders([
+    {
+      name: 'Authorization',
+      deprecated: true,
+      required: false,
+      allowEmptyValue: true,
+    },
+  ])
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'User retrieved successfully',
+    type: ApiBodyUserTokenResponseInterceptor,
+  })
+  public async me(
+    @Headers('Authorization')
+    authorization: string,
+  ) {
     const user = await this.authService.getUserFromHeader(authorization);
     if (!user) {
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);

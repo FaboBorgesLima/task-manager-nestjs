@@ -7,9 +7,10 @@ import {
 
 @Injectable()
 export class BigIntPipe implements PipeTransform {
-  transform(value: unknown, metadata: ArgumentMetadata): bigint {
+  transform(value: unknown, metadata: ArgumentMetadata): string {
     try {
-      return BigInt(String(value));
+      BigInt(String(value));
+      return String(value);
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (e) {
       throw new HttpException(

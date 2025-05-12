@@ -26,9 +26,10 @@ import { DateRangeDto } from '../../types/app/date-range-dto';
 import { UserServiceInterface } from '../../user/domain/user.service.interface';
 import { TaskResponseInterceptor } from './interceptors/task-response.interceptor';
 import { TaskListResponseInterceptor } from './interceptors/task-list-response.interceptor';
+import { BigIntPipe } from '../../big-int/big-int.pipe';
 
-@ApiBearerAuth('Authorization')
 @Controller('tasks')
+@ApiBearerAuth()
 export class TaskController implements TaskHttpAdapter {
   public constructor(
     @Inject(AbstractAuthService)
@@ -38,11 +39,10 @@ export class TaskController implements TaskHttpAdapter {
     @Inject(UserServiceInterface)
     private readonly userService: UserServiceInterface,
   ) {
-    // Constructor logic if needed
+    // Constructor logic if needed0
   }
 
   @Get('/')
-  @ApiBearerAuth('Authorization')
   @UseInterceptors(TaskListResponseInterceptor)
   @ApiOkResponse({
     description: 'The record has been successfully retrieved.',
@@ -74,7 +74,7 @@ export class TaskController implements TaskHttpAdapter {
     type: TaskListResponseDto,
   })
   async findFromUser(
-    @Param('user') userId: string,
+    @Param('user', BigIntPipe) userId: string,
     @Headers('Authorization') authorization: string,
     @Query() range: DateRangeDto,
   ) {
@@ -109,7 +109,7 @@ export class TaskController implements TaskHttpAdapter {
     type: TaskResponseDto,
   })
   async findOne(
-    @Param('task') taskId: string,
+    @Param('task', BigIntPipe) taskId: string,
     @Headers('Authorization') authorization: string,
   ) {
     const [requestUser, task] = await Promise.all([
@@ -157,7 +157,7 @@ export class TaskController implements TaskHttpAdapter {
   @Put('/:task')
   @UseInterceptors(TaskResponseInterceptor)
   async update(
-    @Param('task') taskId: string,
+    @Param('task', BigIntPipe) taskId: string,
     @Body() taskUpdateDTO: TaskUpdateDto,
     @Headers('Authorization') authorization: string,
   ) {
@@ -190,7 +190,7 @@ export class TaskController implements TaskHttpAdapter {
 
   @Delete('/:task')
   async delete(
-    @Param('task') taskId: string,
+    @Param('task', BigIntPipe) taskId: string,
     @Headers('Authorization') authorization: string,
   ) {
     const [requestUser, task] = await Promise.all([
