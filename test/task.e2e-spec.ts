@@ -1,5 +1,4 @@
 import { faker } from '@faker-js/faker/.';
-import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from '../src/app.module';
 import { AbstractAuthService } from '../src/auth/domain/abstract-auth.service';
@@ -9,29 +8,31 @@ import { UserServiceInterface } from '../src/user/domain/user.service.interface'
 import * as request from 'supertest';
 import { clearDatabase } from './helpers/clearDatabase';
 import { TaskResponseDto } from '../src/task/app/dto/task-response-dto';
-import { App } from 'supertest/types';
 import { HashServiceInterface } from '../src/hash/domain/hash.service.interface';
+import {
+  FastifyAdapter,
+  NestFastifyApplication,
+} from '@nestjs/platform-fastify';
 
 describe('TaskController (e2e)', () => {
-  let app: INestApplication<App>;
+  let app: NestFastifyApplication;
   let token: string;
   let user: User;
   let userService: UserServiceInterface;
   let authService: AbstractAuthService;
   let hashService: HashServiceInterface;
 
-  beforeAll(async () => {
-    // Clear the database before all tests
-    await clearDatabase();
-  });
-
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule, typeormModule],
     }).compile();
 
-    app = moduleFixture.createNestApplication();
+    app = moduleFixture.createNestApplication<NestFastifyApplication>(
+      new FastifyAdapter(),
+    );
+
     await app.init();
+    await app.getHttpAdapter().getInstance().ready();
 
     userService = moduleFixture.get<UserServiceInterface>(UserServiceInterface);
     authService = moduleFixture.get<AbstractAuthService>(AbstractAuthService);

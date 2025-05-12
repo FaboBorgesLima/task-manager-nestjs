@@ -6,6 +6,10 @@ import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { faker } from '@faker-js/faker/.';
 import { clearDatabase } from './helpers/clearDatabase';
+import {
+  FastifyAdapter,
+  NestFastifyApplication,
+} from '@nestjs/platform-fastify';
 
 describe('AuthController (e2e)', () => {
   let app: INestApplication<App>;
@@ -20,8 +24,11 @@ describe('AuthController (e2e)', () => {
       imports: [AppModule, typeormModule],
     }).compile();
 
-    app = moduleFixture.createNestApplication();
+    app = moduleFixture.createNestApplication<NestFastifyApplication>(
+      new FastifyAdapter(),
+    );
     await app.init();
+    await app.getHttpAdapter().getInstance().ready();
   });
 
   it('/auth/login (POST)', async () => {

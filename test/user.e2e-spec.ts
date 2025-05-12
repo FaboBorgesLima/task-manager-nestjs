@@ -1,23 +1,27 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import TypeormModule from '../src/database/typeorm.module';
-import { HttpStatus, INestApplication } from '@nestjs/common';
+import { HttpStatus } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { clearDatabase } from './helpers/clearDatabase';
-import { App } from 'supertest/types';
 import { User } from 'src/user/domain/user';
 import { faker } from '@faker-js/faker/.';
+import {
+  FastifyAdapter,
+  NestFastifyApplication,
+} from '@nestjs/platform-fastify';
 
 describe('UserController (e2e)', () => {
-  let app: INestApplication<App>;
+  let app: NestFastifyApplication;
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule, TypeormModule],
     }).compile();
 
-    app = moduleFixture.createNestApplication();
+    app = moduleFixture.createNestApplication(new FastifyAdapter());
     await app.init();
+    await app.getHttpAdapter().getInstance().ready();
   });
 
   it('/users (POST)', async () => {
