@@ -67,7 +67,7 @@ describe('TaskController', () => {
         userId: '',
         dueDate: new Date(),
       },
-      `Bearer ${token}`,
+      user,
     );
 
     expect(task).toBeDefined();
@@ -78,14 +78,10 @@ describe('TaskController', () => {
   });
 
   it('should return tasks for a user', async () => {
-    const tasks = await controller.findFromUser(
-      user.id || '',
-      `Bearer ${token}`,
-      {
-        endDate: new Date(),
-        startDate: new Date(),
-      },
-    );
+    const tasks = await controller.findFromUser(user.id || '', user, {
+      endDate: new Date(),
+      startDate: new Date(),
+    });
 
     expect(tasks).toBeDefined();
     expect(Array.isArray(tasks)).toBeTruthy();
@@ -100,10 +96,10 @@ describe('TaskController', () => {
         dueDate: new Date(),
         status: TaskStatus.PENDING,
       },
-      `Bearer ${token}`,
+      user,
     );
 
-    const taskGet = await controller.findOne(task.id || '', `Bearer ${token}`);
+    const taskGet = await controller.findOne(task.id || '', user);
 
     expect(taskGet).toBeDefined();
     expect(taskGet.id).toBe(task.id);
@@ -119,7 +115,7 @@ describe('TaskController', () => {
 
         status: TaskStatus.PENDING,
       },
-      `Bearer ${token}`,
+      user,
     );
 
     const updatedTask = await controller.update(
@@ -129,7 +125,7 @@ describe('TaskController', () => {
         description: 'This is an updated test task',
         dueDate: new Date(),
       },
-      `Bearer ${token}`,
+      user,
     );
 
     expect(updatedTask).toBeDefined();
@@ -145,10 +141,10 @@ describe('TaskController', () => {
         userId: '',
         dueDate: new Date(),
       },
-      `Bearer ${token}`,
+      user,
     );
 
-    await controller.delete(task.id || '', `Bearer ${token}`);
+    await controller.delete(task.id || '', user);
 
     const deletedTask = await taskService.findById(task.id || '');
     expect(deletedTask).toBeUndefined();

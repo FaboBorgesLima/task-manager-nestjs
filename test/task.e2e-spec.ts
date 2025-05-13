@@ -13,6 +13,7 @@ import {
   FastifyAdapter,
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
+import { HttpStatus } from '@nestjs/common';
 
 describe('TaskController (e2e)', () => {
   let app: NestFastifyApplication;
@@ -67,8 +68,12 @@ describe('TaskController (e2e)', () => {
   });
 
   it('/tasks (GET)', async () => {
-    const response = await request(app.getHttpServer())
+    await request(app.getHttpServer())
       .get('/tasks')
+      .expect(HttpStatus.UNAUTHORIZED);
+
+    const response = await request(app.getHttpServer())
+      .get('/tasks?startDate=2023-01-01&endDate=2023-12-31')
       .set('Authorization', `Bearer ${token}`)
       .expect(200);
 

@@ -14,8 +14,8 @@ import {
 } from '@nestjs/common';
 import { UserServiceInterface } from '../domain/user.service.interface';
 import { User } from '../domain/user';
-import { UserCreateDto } from './dto/user-create-dto';
-import { UserUpdateDto } from './dto/user-update-dto';
+import { UserCreateDto } from './dtos/user-create-dto';
+import { UserUpdateDto } from './dtos/user-update-dto';
 import { AbstractAuthService } from '../../auth/domain/abstract-auth.service';
 import { UserHttpAdapter } from '../domain/user.http.adapter';
 import { HashServiceInterface } from '../../hash/domain/hash.service.interface';
