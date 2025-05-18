@@ -11,8 +11,11 @@ import {
 } from '@nestjs/common';
 import { AuthLoginDto } from './dtos/auth-login.dto';
 import { HashService } from '../../hash/app/hash.service';
-import { AuthHttpAdapter, AbstractAuthService } from 'task-manager-domain/auth';
-import { HashServiceInterface } from 'task-manager-domain/hash';
+import {
+  AuthHttpAdapter,
+  AbstractAuthService,
+} from '@faboborgeslima/task-manager-domain/auth';
+import { HashServiceInterface } from '@faboborgeslima/task-manager-domain/hash';
 import {
   ApiBodyUserTokenResponseInterceptor,
   UserTokenResponseInterceptor,

@@ -4,7 +4,7 @@ import { HttpStatus } from '@nestjs/common';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { clearDatabase } from './helpers/clearDatabase';
-import { User } from 'task-manager-domain/user';
+import { User } from '@faboborgeslima/task-manager-domain/user';
 import { faker } from '@faker-js/faker';
 import {
   FastifyAdapter,

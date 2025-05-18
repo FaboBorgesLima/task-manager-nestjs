@@ -1,4 +1,4 @@
-import { User } from 'task-manager-domain/user';
+import { User } from '@faboborgeslima/task-manager-domain/user';
 import { AuthToken } from './auth-token';
 
 export class AuthTokenUserAdapter {

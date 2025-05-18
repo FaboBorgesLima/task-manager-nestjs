@@ -1,5 +1,5 @@
 import { CallHandler, ExecutionContext, NestInterceptor } from '@nestjs/common';
-import { Task } from 'task-manager-domain/task';
+import { Task } from '@faboborgeslima/task-manager-domain/task';
 import { TaskResponseDto } from '../dto/task-response-dto';
 import { map, Observable } from 'rxjs';
 import { TaskAdapter } from '../../infra/task-adapter';

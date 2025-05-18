@@ -1,13 +1,16 @@
 import { faker } from '@faker-js/faker';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from '../src/app.module';
-import { AbstractAuthService } from 'task-manager-domain/auth';
+import { AbstractAuthService } from '@faboborgeslima/task-manager-domain/auth';
 import typeormModule from '../src/database/typeorm.module';
-import { User, UserRepositoryInterface } from 'task-manager-domain/user';
+import {
+  User,
+  UserRepositoryInterface,
+} from '@faboborgeslima/task-manager-domain/user';
 import request from 'supertest';
 import { clearDatabase } from './helpers/clearDatabase';
 import { TaskResponseDto } from '../src/task/app/dto/task-response-dto';
-import { HashServiceInterface } from 'task-manager-domain/hash';
+import { HashServiceInterface } from '@faboborgeslima/task-manager-domain/hash';
 import {
   FastifyAdapter,
   NestFastifyApplication,

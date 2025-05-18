@@ -5,7 +5,7 @@ import {
   NestInterceptor,
 } from '@nestjs/common';
 import { map, Observable } from 'rxjs';
-import { User } from 'task-manager-domain/user';
+import { User } from '@faboborgeslima/task-manager-domain/user';
 import { UserResponseDto } from '../dtos/user-response-dto';
 import { UserAdapter } from '../../../user/infra/user-adapter';
 

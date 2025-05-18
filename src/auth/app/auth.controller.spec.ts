@@ -1,15 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
-import { UserRepositoryInterface } from 'task-manager-domain/user';
+import { UserRepositoryInterface } from '@faboborgeslima/task-manager-domain/user';
 import { UserMemoryService } from '../../user/infra/services/user-memory.service';
-import { User } from 'task-manager-domain/user';
-import { AbstractAuthService } from 'task-manager-domain/auth';
+import { User } from '@faboborgeslima/task-manager-domain/user';
+import { AbstractAuthService } from '@faboborgeslima/task-manager-domain/auth';
 import { AuthJwtService } from '../infra/services/auth-jwt.service';
 import { JwtModule } from '@nestjs/jwt';
 import {
   HashMockService,
   HashServiceInterface,
-} from 'task-manager-domain/hash';
+} from '@faboborgeslima/task-manager-domain/hash';
 
 describe('AuthController', () => {
   let controller: AuthController;

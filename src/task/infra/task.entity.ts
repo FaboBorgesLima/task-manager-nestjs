@@ -7,7 +7,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { TaskStatus } from 'task-manager-domain/task';
+import { TaskStatus } from '@faboborgeslima/task-manager-domain/task';
 import { UserEntity } from '../../user/infra/user.entity'; // Adjust the import path as needed
 
 @Entity('tasks')

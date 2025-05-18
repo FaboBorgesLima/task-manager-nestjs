@@ -21,13 +21,16 @@ import {
   TaskHttpAdapter,
   Task,
   TaskRepositoryInterface,
-} from 'task-manager-domain/task';
+} from '@faboborgeslima/task-manager-domain/task';
 import { DateRangeDto } from '../../types/app/date-range-dto';
 import { TaskResponseInterceptor } from './interceptors/task-response.interceptor';
 import { TaskListResponseInterceptor } from './interceptors/task-list-response.interceptor';
 import { BigIntPipe } from '../../big-int/big-int.pipe';
 import { Auth } from '../../auth/app/decorators/auth.decorator';
-import { User, UserRepositoryInterface } from 'task-manager-domain/user';
+import {
+  User,
+  UserRepositoryInterface,
+} from '@faboborgeslima/task-manager-domain/user';
 
 @Controller('tasks')
 @ApiBearerAuth()

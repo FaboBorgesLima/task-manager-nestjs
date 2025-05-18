@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { randomUUID } from 'crypto';
-import { TaskRepositoryInterface, Task } from 'task-manager-domain/task';
+import {
+  TaskRepositoryInterface,
+  Task,
+} from '@faboborgeslima/task-manager-domain/task';
 
 @Injectable()
 export class TaskMemoryRepository implements TaskRepositoryInterface {

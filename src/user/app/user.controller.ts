@@ -16,9 +16,9 @@ import {
   UserRepositoryInterface,
   UserHttpAdapter,
   User,
-} from 'task-manager-domain/user';
-import { AbstractAuthService } from 'task-manager-domain/auth';
-import { HashServiceInterface } from 'task-manager-domain/hash';
+} from '@faboborgeslima/task-manager-domain/user';
+import { AbstractAuthService } from '@faboborgeslima/task-manager-domain/auth';
+import { HashServiceInterface } from '@faboborgeslima/task-manager-domain/hash';
 import { UserCreateDto } from './dtos/user-create-dto';
 import { UserUpdateDto } from './dtos/user-update-dto';
 import {

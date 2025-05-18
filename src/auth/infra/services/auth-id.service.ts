@@ -1,6 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { AbstractAuthService } from 'task-manager-domain/auth';
-import { UserRepositoryInterface, User } from 'task-manager-domain/user';
+import { AbstractAuthService } from '@faboborgeslima/task-manager-domain/auth';
+import {
+  UserRepositoryInterface,
+  User,
+} from '@faboborgeslima/task-manager-domain/user';
 
 /**./../auth/domain/abstract-auth.service
  * DO NOT USE THIS CLASS IN PRODUCTION

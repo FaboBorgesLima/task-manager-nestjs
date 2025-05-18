@@ -6,7 +6,7 @@ import {
   Injectable,
   PipeTransform,
 } from '@nestjs/common';
-import { UserRepositoryInterface } from 'task-manager-domain/user';
+import { UserRepositoryInterface } from '@faboborgeslima/task-manager-domain/user';
 
 @Injectable()
 export class UserByIdPipe implements PipeTransform {

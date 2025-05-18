@@ -1,6 +1,9 @@
 import { TaskEntity } from '../task.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Task, TaskRepositoryInterface } from 'task-manager-domain/task';
+import {
+  Task,
+  TaskRepositoryInterface,
+} from '@faboborgeslima/task-manager-domain/task';
 import { TaskAdapter } from '../task-adapter';
 import { Repository } from 'typeorm';
 

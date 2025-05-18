@@ -1,13 +1,19 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TaskController } from './task.controller';
 import { UserMemoryService } from '../../user/infra/services/user-memory.service';
-import { User, UserRepositoryInterface } from 'task-manager-domain/user';
+import {
+  User,
+  UserRepositoryInterface,
+} from '@faboborgeslima/task-manager-domain/user';
 import { faker } from '@faker-js/faker';
-import { TaskStatus, TaskRepositoryInterface } from 'task-manager-domain/task';
-import { AbstractAuthService } from 'task-manager-domain/auth';
+import {
+  TaskStatus,
+  TaskRepositoryInterface,
+} from '@faboborgeslima/task-manager-domain/task';
+import { AbstractAuthService } from '@faboborgeslima/task-manager-domain/auth';
 import { AuthIdService } from '../../auth/infra/services/auth-id.service';
 import { TaskMemoryRepository } from '../infra/services/task-memory.repository';
-import { HashMockService } from 'task-manager-domain/hash';
+import { HashMockService } from '@faboborgeslima/task-manager-domain/hash';
 
 describe('TaskController', () => {
   let controller: TaskController;

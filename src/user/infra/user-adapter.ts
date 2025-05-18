@@ -1,5 +1,5 @@
 import { UserResponseDto } from '../app/dtos/user-response-dto';
-import { User } from 'task-manager-domain/user';
+import { User } from '@faboborgeslima/task-manager-domain/user';
 import { UserEntity } from './user.entity';
 
 export class UserAdapter {
