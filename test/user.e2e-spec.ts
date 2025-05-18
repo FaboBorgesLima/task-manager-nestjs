@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import TypeormModule from '../src/database/typeorm.module';
 import { HttpStatus } from '@nestjs/common';
-import * as request from 'supertest';
+import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { clearDatabase } from './helpers/clearDatabase';
-import { User } from '../src/user/domain/user';
-import { faker } from '@faker-js/faker/.';
+import { User } from 'task-manager-domain/user';
+import { faker } from '@faker-js/faker';
 import {
   FastifyAdapter,
   NestFastifyApplication,
