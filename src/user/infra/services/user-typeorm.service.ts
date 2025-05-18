@@ -1,6 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { UserRepositoryInterface } from '../../domain/user.repository.interface';
-import { User } from '../../domain/user';
+import { User, UserRepositoryInterface } from 'task-manager-domain/user';
 import { Repository } from 'typeorm';
 import { UserEntity } from '../user.entity';
 import { InjectRepository } from '@nestjs/typeorm';

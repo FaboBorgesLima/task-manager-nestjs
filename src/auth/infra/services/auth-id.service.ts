@@ -1,14 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { AbstractAuthService } from '../../domain/abstract-auth.service';
-import { UserRepositoryInterface } from '../../../user/domain/user.repository.interface';
-import { User } from '../../../user/domain/user';
+import { AbstractAuthService } from 'task-manager-domain/auth';
+import { UserRepositoryInterface, User } from 'task-manager-domain/user';
 
-/**
+/**./../auth/domain/abstract-auth.service
  * DO NOT USE THIS CLASS IN PRODUCTION
  * This class is for testing purposes only.
  * It uses the user ID as the token.
  * This is not secure and should not be used in production.
- * Use AuthJwtService instead.
+ * Use AuthJwtService instead../../auth/domain/abstract-auth.service
  * @see AuthJwtService
  */
 @Injectable()

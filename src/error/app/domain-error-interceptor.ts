@@ -5,7 +5,7 @@ import {
   Injectable,
   NestInterceptor,
 } from '@nestjs/common';
-import { DomainError } from '../domain/domain-error';
+import { DomainError } from 'task-manager-domain/error';
 import { catchError, Observable } from 'rxjs';
 
 @Injectable()

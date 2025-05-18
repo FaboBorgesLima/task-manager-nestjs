@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
-import { AbstractAuthService } from '../domain/abstract-auth.service';
+import { AbstractAuthService } from 'task-manager-domain/auth';
 import { AuthJwtService } from '../infra/services/auth-jwt.service';
 import { HashService } from '../../hash/app/hash.service';
 import { JwtConfigModule } from '../../jwt/jwt-config.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from '../../user/infra/user.entity';
-import { HashServiceInterface } from '../../hash/domain/hash.service.interface';
-import { UserRepositoryInterface } from '../../user/domain/user.repository.interface';
+import { HashServiceInterface } from 'task-manager-domain/hash';
+import { UserRepositoryInterface } from 'task-manager-domain/user';
 import { UserTypeORMService } from '../../user/infra/services/user-typeorm.service';
 
 @Module({
