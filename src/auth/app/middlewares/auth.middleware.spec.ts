@@ -17,19 +17,27 @@ describe('AuthMiddleware', () => {
       headers: {},
     });
     const res = createResponse();
-    const next = () => {};
+
+    // Mock the response methods
+    /* eslint-disable @typescript-eslint/unbound-method */
+    jest.spyOn(res, 'writeHead');
+    jest.spyOn(res, 'write');
+    jest.spyOn(res, 'end');
+
+    const next = jest.fn();
 
     await middleware.use(req, res, next.bind(next) as () => void);
 
-    expect(res.writeHead.bind(res)).toHaveBeenCalledWith(401, {
+    expect(res.writeHead).toHaveBeenCalledWith(401, {
       'Content-Type': 'application/json',
     });
-    expect(res.write.bind(res)).toHaveBeenCalledWith(
+    expect(res.write).toHaveBeenCalledWith(
       JSON.stringify({
         statusCode: 401,
         message: 'Unauthorized',
       }),
     );
-    expect(res.end.bind(res)).toHaveBeenCalled();
+    expect(res.end).toHaveBeenCalled();
+    /* eslint-enable @typescript-eslint/unbound-method */
   });
 });
