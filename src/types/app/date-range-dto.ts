@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { DateRange } from '../domain/date-range';
-import { IsDate } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class DateRangeDto implements DateRange {

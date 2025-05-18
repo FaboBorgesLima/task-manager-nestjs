@@ -12,7 +12,7 @@ async function main() {
     new FastifyAdapter(),
   );
 
-  await bootstrap(app);
+  bootstrap(app);
 
   await app.listen(process.env.PORT ?? 3000, '0.0.0.0');
   await app.getHttpAdapter().getInstance().ready();

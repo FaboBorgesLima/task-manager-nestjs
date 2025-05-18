@@ -1,6 +1,7 @@
 import { AuthIdService } from '../../../auth/infra/services/auth-id.service';
 import { AuthMiddleware } from './auth.middleware';
 import { UserMemoryService } from '../../../user/infra/services/user-memory.service';
+import { createRequest, createResponse } from 'node-mocks-http';
 
 describe('AuthMiddleware', () => {
   it('should be defined', () => {
@@ -9,31 +10,26 @@ describe('AuthMiddleware', () => {
     ).toBeDefined();
   });
   it('should return 401 if no auth token is provided', async () => {
-    const req = {
-      headers: {},
-    } as any;
-    const res = {
-      writeHead: jest.fn(),
-      write: jest.fn(),
-      end: jest.fn(),
-    } as any;
-    const next = jest.fn();
-
     const middleware = new AuthMiddleware(
       new AuthIdService(new UserMemoryService()),
     );
+    const req = createRequest({
+      headers: {},
+    });
+    const res = createResponse();
+    const next = () => {};
 
-    await middleware.use(req, res, next);
+    await middleware.use(req, res, next.bind(next) as () => void);
 
-    expect(res.writeHead).toHaveBeenCalledWith(401, {
+    expect(res.writeHead.bind(res)).toHaveBeenCalledWith(401, {
       'Content-Type': 'application/json',
     });
-    expect(res.write).toHaveBeenCalledWith(
+    expect(res.write.bind(res)).toHaveBeenCalledWith(
       JSON.stringify({
         statusCode: 401,
         message: 'Unauthorized',
       }),
     );
-    expect(res.end).toHaveBeenCalled();
+    expect(res.end.bind(res)).toHaveBeenCalled();
   });
 });

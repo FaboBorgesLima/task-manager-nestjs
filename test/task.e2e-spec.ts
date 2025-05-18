@@ -32,7 +32,7 @@ describe('TaskController (e2e)', () => {
     app = moduleFixture.createNestApplication<NestFastifyApplication>(
       new FastifyAdapter(),
     );
-    await bootstrap(app);
+    bootstrap(app);
 
     await app.init();
     await app.getHttpAdapter().getInstance().ready();

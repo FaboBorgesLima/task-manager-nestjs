@@ -1,9 +1,9 @@
 import { TaskRepositoryInterface } from '../../domain/task.repository.interface';
 import { TaskEntity } from '../task.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Between, Or, Repository } from 'typeorm';
 import { Task } from '../../domain/task';
 import { TaskAdapter } from '../task-adapter';
+import { Repository } from 'typeorm';
 
 export class TaskTypeORMRepository implements TaskRepositoryInterface {
   constructor(
@@ -36,7 +36,6 @@ export class TaskTypeORMRepository implements TaskRepositoryInterface {
     startDate: Date,
     endDate: Date,
   ): Promise<Task[]> {
-    Or();
     const tasks = await this.taskRepository
       .createQueryBuilder('task')
       .where('task.userId = :userId', { userId })

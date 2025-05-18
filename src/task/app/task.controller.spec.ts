@@ -17,7 +17,6 @@ describe('TaskController', () => {
   const taskService: TaskRepositoryInterface = new TaskMemoryRepository();
   const authService: AbstractAuthService = new AuthIdService(userService);
   let user: User;
-  let token: string;
 
   beforeAll(async () => {
     user = User.create(
@@ -29,7 +28,6 @@ describe('TaskController', () => {
       HashMockService.getInstance(),
     );
     await userService.saveOne(user);
-    token = await authService.toToken(user);
   });
 
   beforeEach(async () => {

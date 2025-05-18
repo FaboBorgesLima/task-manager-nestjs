@@ -1,8 +1,6 @@
-import { App } from 'supertest/types';
 import { AppModule } from '../src/app.module';
 import typeormModule from '../src/database/typeorm.module';
 import * as request from 'supertest';
-import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { faker } from '@faker-js/faker/.';
 import { clearDatabase } from './helpers/clearDatabase';
@@ -12,7 +10,7 @@ import {
 } from '@nestjs/platform-fastify';
 
 describe('AuthController (e2e)', () => {
-  let app: INestApplication<App>;
+  let app: NestFastifyApplication;
 
   beforeAll(async () => {
     // Clear the database before all tests

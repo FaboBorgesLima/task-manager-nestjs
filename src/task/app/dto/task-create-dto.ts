@@ -1,12 +1,6 @@
 import { TaskCreateProps } from '../../domain/types/task-create-props';
 import { TaskStatus } from '../../domain/task-status.enum';
-import {
-  IsBoolean,
-  IsDate,
-  IsEnum,
-  IsOptional,
-  IsString,
-} from 'class-validator';
+import { IsDate, IsEnum, IsOptional, IsString } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
