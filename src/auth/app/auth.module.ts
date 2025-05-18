@@ -7,14 +7,14 @@ import { JwtConfigModule } from '../../jwt/jwt-config.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from '../../user/infra/user.entity';
 import { HashServiceInterface } from '../../hash/domain/hash.service.interface';
-import { UserServiceInterface } from '../../user/domain/user.service.interface';
+import { UserRepositoryInterface } from '../../user/domain/user.repository.interface';
 import { UserTypeORMService } from '../../user/infra/services/user-typeorm.service';
 
 @Module({
   controllers: [AuthController],
   providers: [
     {
-      provide: UserServiceInterface,
+      provide: UserRepositoryInterface,
       useClass: UserTypeORMService,
     },
     {
@@ -37,7 +37,7 @@ import { UserTypeORMService } from '../../user/infra/services/user-typeorm.servi
       useClass: HashService,
     },
     {
-      provide: UserServiceInterface,
+      provide: UserRepositoryInterface,
       useClass: UserTypeORMService,
     },
     TypeOrmModule.forFeature([UserEntity]),

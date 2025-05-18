@@ -1,11 +1,11 @@
-import { TaskServiceInterface } from '../../domain/task.service.interface';
+import { TaskRepositoryInterface } from '../../domain/task.repository.interface';
 import { TaskEntity } from '../task.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Between, Repository } from 'typeorm';
 import { Task } from '../../domain/task';
 import { TaskAdapter } from '../task-adapter';
+import { Repository } from 'typeorm';
 
-export class TaskTypeORMService implements TaskServiceInterface {
+export class TaskTypeORMRepository implements TaskRepositoryInterface {
   constructor(
     @InjectRepository(TaskEntity)
     private readonly taskRepository: Repository<TaskEntity>,
@@ -36,12 +36,14 @@ export class TaskTypeORMService implements TaskServiceInterface {
     startDate: Date,
     endDate: Date,
   ): Promise<Task[]> {
-    const tasks = await this.taskRepository.find({
-      where: {
-        userId,
-        dueDate: Between(startDate, endDate),
-      },
-    });
+    const tasks = await this.taskRepository
+      .createQueryBuilder('task')
+      .where('task.userId = :userId', { userId })
+      .andWhere(
+        '(task.start BETWEEN :startDate AND :endDate OR task.end BETWEEN :startDate AND :endDate)',
+        { startDate, endDate },
+      )
+      .getMany();
 
     return tasks.map((task) => TaskAdapter.fromEntity(task).toDomain());
   }

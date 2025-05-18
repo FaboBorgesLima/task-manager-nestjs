@@ -1,6 +1,6 @@
 import { User } from './user';
 
-export interface UserServiceInterface {
+export interface UserRepositoryInterface {
   findAll(): Promise<User[]>;
   findOne(id: string): Promise<User | void>;
   saveOne(user: User): Promise<User>;
@@ -8,4 +8,4 @@ export interface UserServiceInterface {
   findByEmailPassword(email: string, password: string): Promise<User | void>;
 }
 
-export const UserServiceInterface = Symbol('UserServiceInterface');
+export const UserRepositoryInterface = Symbol('UserRepositoryInterface');

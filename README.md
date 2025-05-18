@@ -71,5 +71,5 @@ most details about the project, like data modeling and screen prototypes, can be
 - [ ] **RA5 - Implementar autenticação, autorização e segurança em APIs utilizando JWT, Guards, Middleware e Interceptadores.**
   - [x] **ID19:** Configurar a autenticação na API utilizando JWT (JSON Web Tokens).
   - [ ] **ID20:** Implementar controle de acesso baseado em roles e níveis de permissão, utilizando Guards para verificar permissões em rotas específicas.
-  - [ ] **ID21:** Configurar e utilizar middleware para manipular requisições antes que elas cheguem aos controladores, realizando tarefas como autenticação, logging ou tratamento de CORS.
+  - [x] **ID21:** Configurar e utilizar middleware para manipular requisições antes que elas cheguem aos controladores, realizando tarefas como autenticação, logging ou tratamento de CORS.
   - [x] **ID22:** Implementar interceptadores para realizar logging ou modificar as respostas antes de enviá-las ao cliente.

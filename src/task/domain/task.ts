@@ -8,7 +8,8 @@ export class Task {
   protected _id?: string;
   protected _title: string;
   protected _description?: string;
-  protected _dueDate: Date;
+  protected _start: Date;
+  protected _end: Date;
   protected _status: TaskStatus;
   public readonly createdAt: Date;
   protected _updatedAt: Date;
@@ -28,11 +29,21 @@ export class Task {
 
     this.createdAt = params.createdAt;
     this._updatedAt = params.updatedAt;
-    this._dueDate = params.dueDate;
+    this._start = params.start;
+    this._end = params.end;
   }
 
   get title(): string {
     return this._title;
+  }
+
+  get isEntireDay(): boolean {
+    const diff = this._end.getTime() - this._start.getTime();
+    return (
+      this._end.getMonth() === this._start.getMonth() &&
+      this._end.getFullYear() === this._start.getFullYear() &&
+      diff === 24 * 60 * 60 * 1000 - 1 // 24 hours in milliseconds
+    );
   }
 
   set title(value: string) {
@@ -44,17 +55,6 @@ export class Task {
 
   get updatedAt(): Date {
     return this._updatedAt;
-  }
-
-  get dueDate(): Date {
-    return this._dueDate;
-  }
-
-  set dueDate(value: Date) {
-    if (value < new Date()) {
-      throw new Error('Due date cannot be in the past');
-    }
-    this._dueDate = value;
   }
 
   get status(): TaskStatus {
@@ -89,12 +89,17 @@ export class Task {
     return this._id;
   }
 
+  set id(value: string | undefined) {
+    this._id = value;
+  }
+
   public static create({
     title,
     description,
     userId,
     status = TaskStatus.PENDING,
-    dueDate,
+    start,
+    end,
   }: TaskCreateProps): Task {
     if (!this.isTitleValid(title)) {
       throw new Error('Title must be at least 3 characters long');
@@ -107,7 +112,8 @@ export class Task {
       status,
       createdAt: new Date(),
       updatedAt: new Date(),
-      dueDate,
+      start,
+      end,
     });
   }
 
@@ -135,11 +141,41 @@ export class Task {
     return this._userId === user.id;
   }
 
+  public setSpan(start: Date, end: Date) {
+    this._start = start;
+    this._end = end;
+  }
+
+  public get start(): Date {
+    return this._start;
+  }
+
+  public get end(): Date {
+    return this._end;
+  }
+
+  public set start(value: Date) {
+    this._start = value;
+  }
+
+  public set end(value: Date) {
+    this._end = value;
+  }
+
+  public setTaskToEntireDay(): void {
+    this._start.setHours(0, 0, 0, 0);
+
+    this._end = new Date(this._start.getTime());
+
+    this._end.setHours(23, 59, 59, 999);
+  }
+
   public update({
     title,
     description,
     status,
-    dueDate,
+    start,
+    end,
   }: TaskUpdateProps): void {
     if (title) {
       if (!Task.isTitleValid(title)) {
@@ -156,8 +192,12 @@ export class Task {
       this._status = status;
     }
 
-    if (dueDate) {
-      this._dueDate = dueDate;
+    if (start) {
+      this._start = start;
+    }
+
+    if (end) {
+      this._end = end;
     }
 
     this._updatedAt = new Date();

@@ -1,39 +1,45 @@
 import { faker } from '@faker-js/faker/.';
-import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from '../src/app.module';
 import { AbstractAuthService } from '../src/auth/domain/abstract-auth.service';
 import typeormModule from '../src/database/typeorm.module';
 import { User } from '../src/user/domain/user';
-import { UserServiceInterface } from '../src/user/domain/user.service.interface';
+import { UserRepositoryInterface } from '../src/user/domain/user.repository.interface';
 import * as request from 'supertest';
 import { clearDatabase } from './helpers/clearDatabase';
 import { TaskResponseDto } from '../src/task/app/dto/task-response-dto';
-import { App } from 'supertest/types';
 import { HashServiceInterface } from '../src/hash/domain/hash.service.interface';
+import {
+  FastifyAdapter,
+  NestFastifyApplication,
+} from '@nestjs/platform-fastify';
+import { HttpStatus } from '@nestjs/common';
+import { bootstrap } from '../src/bootstrap';
 
 describe('TaskController (e2e)', () => {
-  let app: INestApplication<App>;
+  let app: NestFastifyApplication;
   let token: string;
   let user: User;
-  let userService: UserServiceInterface;
+  let userService: UserRepositoryInterface;
   let authService: AbstractAuthService;
   let hashService: HashServiceInterface;
-
-  beforeAll(async () => {
-    // Clear the database before all tests
-    await clearDatabase();
-  });
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule, typeormModule],
     }).compile();
 
-    app = moduleFixture.createNestApplication();
-    await app.init();
+    app = moduleFixture.createNestApplication<NestFastifyApplication>(
+      new FastifyAdapter(),
+    );
+    bootstrap(app);
 
-    userService = moduleFixture.get<UserServiceInterface>(UserServiceInterface);
+    await app.init();
+    await app.getHttpAdapter().getInstance().ready();
+
+    userService = moduleFixture.get<UserRepositoryInterface>(
+      UserRepositoryInterface,
+    );
     authService = moduleFixture.get<AbstractAuthService>(AbstractAuthService);
     hashService = moduleFixture.get<HashServiceInterface>(HashServiceInterface);
     user = User.create(
@@ -56,7 +62,8 @@ describe('TaskController (e2e)', () => {
       .send({
         title: 'Test Task',
         description: 'This is a test task',
-        dueDate: new Date(),
+        start: new Date(),
+        end: new Date(),
       })
       .expect(201);
 
@@ -66,8 +73,12 @@ describe('TaskController (e2e)', () => {
   });
 
   it('/tasks (GET)', async () => {
-    const response = await request(app.getHttpServer())
+    await request(app.getHttpServer())
       .get('/tasks')
+      .expect(HttpStatus.UNAUTHORIZED);
+
+    const response = await request(app.getHttpServer())
+      .get('/tasks?startDate=2023-01-01&endDate=2023-12-31')
       .set('Authorization', `Bearer ${token}`)
       .expect(200);
 
@@ -82,7 +93,8 @@ describe('TaskController (e2e)', () => {
       .send({
         title: 'Test Task',
         description: 'This is a test task',
-        dueDate: new Date(),
+        start: new Date(),
+        end: new Date(),
       })
       .expect(201);
 
@@ -105,7 +117,8 @@ describe('TaskController (e2e)', () => {
       .send({
         title: 'Test Task',
         description: 'This is a test task',
-        dueDate: new Date(),
+        start: new Date(),
+        end: new Date(),
       })
       .expect(201);
     const createResponseBody = createResponse.body as TaskResponseDto;
@@ -117,7 +130,8 @@ describe('TaskController (e2e)', () => {
         status: 'completed',
         title: 'Updated Task',
         description: 'This is an updated test task',
-        dueDate: new Date(),
+        start: new Date(),
+        end: new Date(),
       });
 
     expect(response.status).toBe(200);
@@ -138,7 +152,8 @@ describe('TaskController (e2e)', () => {
       .send({
         title: 'Test Task',
         description: 'This is a test task',
-        dueDate: new Date(),
+        start: new Date(),
+        end: new Date(),
       })
       .expect(201);
     const createResponseBody = createResponse.body as TaskResponseDto;

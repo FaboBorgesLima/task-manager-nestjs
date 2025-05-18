@@ -8,5 +8,6 @@ export type TaskConstructorProps = {
   status: TaskStatus;
   createdAt: Date;
   updatedAt: Date;
-  dueDate: Date;
+  start: Date;
+  end: Date;
 };

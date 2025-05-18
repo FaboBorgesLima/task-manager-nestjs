@@ -9,7 +9,7 @@ import {
   Post,
   UseInterceptors,
 } from '@nestjs/common';
-import { AuthLoginDto } from './dto/auth-login.dto';
+import { AuthLoginDto } from './dtos/auth-login.dto';
 import { HashService } from '../../hash/app/hash.service';
 import { AbstractAuthService } from '../domain/abstract-auth.service';
 import { AuthHttpAdapter } from '../domain/auth.http-adapter';

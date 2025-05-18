@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { map, Observable } from 'rxjs';
 import { User } from '../../domain/user';
-import { UserResponseDto } from '../dto/user-response-dto';
+import { UserResponseDto } from '../dtos/user-response-dto';
 import { UserAdapter } from '../../../user/infra/user-adapter';
 import { ApiProperty } from '@nestjs/swagger';
 

@@ -23,5 +23,9 @@ export class TaskUpdateDto implements TaskUpdateProps {
   @ApiProperty()
   @Type(() => Date)
   @IsOptional()
-  dueDate?: Date;
+  start: Date;
+  @ApiProperty()
+  @Type(() => Date)
+  @IsOptional()
+  end: Date;
 }

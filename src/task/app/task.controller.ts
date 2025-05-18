@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  Headers,
   Inject,
   NotFoundException,
   Param,
@@ -13,8 +12,7 @@ import {
   UnauthorizedException,
   UseInterceptors,
 } from '@nestjs/common';
-import { AbstractAuthService } from '../../auth/domain/abstract-auth.service';
-import { TaskServiceInterface } from '../domain/task.service.interface';
+import { TaskRepositoryInterface } from '../domain/task.repository.interface';
 import { Task } from '../domain/task';
 import { TaskUpdateDto } from './dto/task-update-dto';
 import { TaskCreateDTO } from './dto/task-create-dto';
@@ -23,21 +21,21 @@ import { TaskResponseDto } from './dto/task-response-dto';
 import { TaskListResponseDto } from './dto/task-list-response-dto';
 import { TaskHttpAdapter } from '../domain/task.http.adapter';
 import { DateRangeDto } from '../../types/app/date-range-dto';
-import { UserServiceInterface } from '../../user/domain/user.service.interface';
+import { UserRepositoryInterface } from '../../user/domain/user.repository.interface';
 import { TaskResponseInterceptor } from './interceptors/task-response.interceptor';
 import { TaskListResponseInterceptor } from './interceptors/task-list-response.interceptor';
 import { BigIntPipe } from '../../big-int/big-int.pipe';
+import { Auth } from '../../auth/app/decorators/auth.decorator';
+import { User } from '../../user/domain/user';
 
 @Controller('tasks')
 @ApiBearerAuth()
 export class TaskController implements TaskHttpAdapter {
   public constructor(
-    @Inject(AbstractAuthService)
-    private readonly authService: AbstractAuthService,
-    @Inject(TaskServiceInterface)
-    private readonly taskService: TaskServiceInterface,
-    @Inject(UserServiceInterface)
-    private readonly userService: UserServiceInterface,
+    @Inject(TaskRepositoryInterface)
+    private readonly taskRepository: TaskRepositoryInterface,
+    @Inject(UserRepositoryInterface)
+    private readonly userRepository: UserRepositoryInterface,
   ) {
     // Constructor logic if needed0
   }
@@ -49,21 +47,16 @@ export class TaskController implements TaskHttpAdapter {
     type: TaskListResponseDto,
   })
   async findFromCurrentUser(
-    @Headers('Authorization') authorization: string,
+    @Auth() requestUser: User,
     @Query() query: DateRangeDto,
   ) {
-    const requestUser = await this.authService.getUserFromHeader(authorization);
-    if (!requestUser) {
-      throw new UnauthorizedException('User not found');
-    }
-
-    return this.findFromUser(requestUser.id || '', authorization, query);
+    return this.findFromUser(requestUser.id || '', requestUser, query);
   }
 
   /**
    * TODO: Add pagination
    * @param user
-   * @param authorization
+   * @param requestUser
    * @returns
    */
   @ApiParam({ name: 'user', type: String })
@@ -75,15 +68,12 @@ export class TaskController implements TaskHttpAdapter {
   })
   async findFromUser(
     @Param('user', BigIntPipe) userId: string,
-    @Headers('Authorization') authorization: string,
+    @Auth() requestUser: User,
     @Query() range: DateRangeDto,
   ) {
-    const [requestUser, user] = await Promise.all([
-      this.authService.getUserFromHeader(authorization),
-      this.userService.findOne(userId),
-    ]);
+    const user = await this.userRepository.findOne(userId);
 
-    if (!requestUser || !user) {
+    if (!user) {
       throw new UnauthorizedException('User not found');
     }
 
@@ -92,12 +82,12 @@ export class TaskController implements TaskHttpAdapter {
     }
 
     const tasks = range
-      ? await this.taskService.findByUserAndDate(
+      ? await this.taskRepository.findByUserAndDate(
           userId,
           range.startDate,
           range.endDate,
         )
-      : await this.taskService.findByUser(userId);
+      : await this.taskRepository.findByUser(userId);
 
     return tasks;
   }
@@ -110,18 +100,12 @@ export class TaskController implements TaskHttpAdapter {
   })
   async findOne(
     @Param('task', BigIntPipe) taskId: string,
-    @Headers('Authorization') authorization: string,
+    @Auth() requestUser: User,
   ) {
-    const [requestUser, task] = await Promise.all([
-      this.authService.getUserFromHeader(authorization),
-      this.taskService.findById(taskId),
-    ]);
+    const [task] = await Promise.all([this.taskRepository.findById(taskId)]);
 
     if (!task) {
       throw new NotFoundException('Task not found');
-    }
-    if (!requestUser) {
-      throw new NotFoundException('User not found');
     }
 
     if (!task.canBeViewed(requestUser)) {
@@ -135,17 +119,11 @@ export class TaskController implements TaskHttpAdapter {
   @UseInterceptors(TaskResponseInterceptor)
   async create(
     @Body() taskCreateDTO: TaskCreateDTO,
-    @Headers('Authorization') authorization: string,
+    @Auth() requestUser: User,
   ) {
-    const requestUser = await this.authService.getUserFromHeader(authorization);
-
-    if (!requestUser) {
-      throw new UnauthorizedException('User not found');
-    }
-
     taskCreateDTO.userId = requestUser.id || '';
 
-    const task = await this.taskService.save(Task.create(taskCreateDTO));
+    const task = await this.taskRepository.save(Task.create(taskCreateDTO));
 
     return task;
   }
@@ -159,19 +137,9 @@ export class TaskController implements TaskHttpAdapter {
   async update(
     @Param('task', BigIntPipe) taskId: string,
     @Body() taskUpdateDTO: TaskUpdateDto,
-    @Headers('Authorization') authorization: string,
+    @Auth() requestUser: User,
   ) {
-    const awaitedServices = await Promise.all([
-      this.authService.getUserFromHeader(authorization),
-      this.taskService.findById(taskId),
-    ]);
-
-    const requestUser = awaitedServices[0];
-    let task = awaitedServices[1];
-
-    if (!requestUser) {
-      throw new NotFoundException('User not found');
-    }
+    let task = await this.taskRepository.findById(taskId);
 
     if (!task) {
       throw new NotFoundException('Task not found');
@@ -183,7 +151,7 @@ export class TaskController implements TaskHttpAdapter {
 
     task.update(taskUpdateDTO);
 
-    task = await this.taskService.save(task);
+    task = await this.taskRepository.save(task);
 
     return task;
   }
@@ -191,25 +159,18 @@ export class TaskController implements TaskHttpAdapter {
   @Delete('/:task')
   async delete(
     @Param('task', BigIntPipe) taskId: string,
-    @Headers('Authorization') authorization: string,
+    @Auth() authorization: User,
   ) {
-    const [requestUser, task] = await Promise.all([
-      this.authService.getUserFromHeader(authorization),
-      this.taskService.findById(taskId),
-    ]);
-
-    if (!requestUser) {
-      throw new NotFoundException('User not found');
-    }
+    const task = await this.taskRepository.findById(taskId);
 
     if (!task) {
       throw new NotFoundException('Task not found');
     }
 
-    if (!task.canBeDeleted(requestUser)) {
+    if (!task.canBeDeleted(authorization)) {
       throw new UnauthorizedException('User cannot delete this task');
     }
 
-    return await this.taskService.delete(taskId);
+    return await this.taskRepository.delete(taskId);
   }
 }

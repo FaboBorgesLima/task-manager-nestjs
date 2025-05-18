@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
-import { UserServiceInterface } from '../../user/domain/user.service.interface';
+import { UserRepositoryInterface } from '../../user/domain/user.repository.interface';
 import { UserMemoryService } from '../../user/infra/services/user-memory.service';
 import { User } from '../../user/domain/user';
 import { AbstractAuthService } from '../domain/abstract-auth.service';
@@ -17,14 +17,17 @@ describe('AuthController', () => {
       controllers: [AuthController],
       providers: [
         {
-          provide: UserServiceInterface,
+          provide: UserRepositoryInterface,
           useClass: UserMemoryService,
         },
         {
           provide: AbstractAuthService,
           useClass: AuthJwtService,
         },
-        { provide: HashServiceInterface, useClass: HashMockService },
+        {
+          provide: HashServiceInterface,
+          useClass: HashMockService,
+        },
       ],
       imports: [
         JwtModule.register({

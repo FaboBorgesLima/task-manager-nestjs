@@ -4,5 +4,6 @@ export type TaskUpdateProps = {
   title?: string;
   description?: string;
   status?: TaskStatus;
-  dueDate?: Date;
+  start?: Date;
+  end?: Date;
 };

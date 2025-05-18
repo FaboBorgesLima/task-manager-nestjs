@@ -25,7 +25,10 @@ export class TaskEntity {
   public status: TaskStatus;
 
   @Column({ type: 'timestamptz', nullable: false })
-  public dueDate: Date;
+  public start: Date;
+
+  @Column({ type: 'timestamptz', nullable: false })
+  public end: Date;
 
   @ManyToOne(() => UserEntity, (user) => user.tasks, {
     nullable: false,
