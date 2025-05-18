@@ -6,13 +6,13 @@ import {
   Injectable,
   PipeTransform,
 } from '@nestjs/common';
-import { UserServiceInterface } from '../user/domain/user.service.interface';
+import { UserRepositoryInterface } from '../user/domain/user.repository.interface';
 
 @Injectable()
 export class UserByIdPipe implements PipeTransform {
   constructor(
-    @Inject(UserServiceInterface)
-    private readonly userService: UserServiceInterface,
+    @Inject(UserRepositoryInterface)
+    private readonly userRepository: UserRepositoryInterface,
   ) {}
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async transform(value: unknown, metadata: ArgumentMetadata) {
@@ -31,7 +31,7 @@ export class UserByIdPipe implements PipeTransform {
     }
 
     try {
-      const user = await this.userService.findOne(value);
+      const user = await this.userRepository.findOne(value);
       if (!user) {
         throw new HttpException('User not found', HttpStatus.NOT_FOUND);
       }

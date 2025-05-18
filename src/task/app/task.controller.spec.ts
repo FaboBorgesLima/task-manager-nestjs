@@ -1,20 +1,20 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TaskController } from './task.controller';
-import { UserServiceInterface } from '../../user/domain/user.service.interface';
+import { UserRepositoryInterface } from '../../user/domain/user.repository.interface';
 import { UserMemoryService } from '../../user/infra/services/user-memory.service';
 import { User } from '../../user/domain/user';
 import { faker } from '@faker-js/faker/.';
 import { TaskStatus } from '../domain/task-status.enum';
-import { TaskServiceInterface } from '../domain/task.service.interface';
+import { TaskRepositoryInterface } from '../domain/task.repository.interface';
 import { AbstractAuthService } from '../../auth/domain/abstract-auth.service';
 import { AuthIdService } from '../../auth/infra/services/auth-id.service';
-import { TaskMemoryService } from '../infra/services/task-memory.service';
+import { TaskMemoryRepository } from '../infra/services/task-memory.repository';
 import { HashMockService } from '../../hash/app/hash-mock.service';
 
 describe('TaskController', () => {
   let controller: TaskController;
-  const userService: UserServiceInterface = new UserMemoryService();
-  const taskService: TaskServiceInterface = new TaskMemoryService();
+  const userService: UserRepositoryInterface = new UserMemoryService();
+  const taskService: TaskRepositoryInterface = new TaskMemoryRepository();
   const authService: AbstractAuthService = new AuthIdService(userService);
   let user: User;
   let token: string;
@@ -38,11 +38,11 @@ describe('TaskController', () => {
       imports: [],
       providers: [
         {
-          provide: UserServiceInterface,
+          provide: UserRepositoryInterface,
           useValue: userService,
         },
         {
-          provide: TaskServiceInterface,
+          provide: TaskRepositoryInterface,
           useValue: taskService,
         },
         {
@@ -65,7 +65,8 @@ describe('TaskController', () => {
         title: 'Test Task',
         description: 'This is a test task',
         userId: '',
-        dueDate: new Date(),
+        start: new Date(),
+        end: new Date(),
       },
       user,
     );
@@ -93,7 +94,8 @@ describe('TaskController', () => {
         title: 'Test Task',
         description: 'This is a test task',
         userId: '',
-        dueDate: new Date(),
+        start: new Date(),
+        end: new Date(),
         status: TaskStatus.PENDING,
       },
       user,
@@ -111,7 +113,8 @@ describe('TaskController', () => {
         title: 'Test Task',
         description: 'This is a test task',
         userId: '',
-        dueDate: new Date(),
+        start: new Date(),
+        end: new Date(),
 
         status: TaskStatus.PENDING,
       },
@@ -123,7 +126,8 @@ describe('TaskController', () => {
       {
         title: 'Updated Task',
         description: 'This is an updated test task',
-        dueDate: new Date(),
+        start: new Date(),
+        end: new Date(),
       },
       user,
     );
@@ -139,7 +143,8 @@ describe('TaskController', () => {
         title: 'Test Task',
         description: 'This is a test task',
         userId: '',
-        dueDate: new Date(),
+        start: new Date(),
+        end: new Date(),
       },
       user,
     );

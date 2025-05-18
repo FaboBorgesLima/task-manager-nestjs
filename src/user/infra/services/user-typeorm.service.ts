@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { UserServiceInterface } from '../../domain/user.service.interface';
+import { UserRepositoryInterface } from '../../domain/user.repository.interface';
 import { User } from '../../domain/user';
 import { Repository } from 'typeorm';
 import { UserEntity } from '../user.entity';
@@ -7,7 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserAdapter } from '../user-adapter';
 
 @Injectable()
-export class UserTypeORMService implements UserServiceInterface {
+export class UserTypeORMService implements UserRepositoryInterface {
   public constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,

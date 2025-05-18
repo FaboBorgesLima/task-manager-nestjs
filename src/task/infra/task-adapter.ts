@@ -13,9 +13,12 @@ export class TaskAdapter {
     taskEntity.id = this.task.id;
     taskEntity.title = this.task.title;
     taskEntity.description = this.task.description;
-    taskEntity.dueDate = this.task.dueDate;
+    taskEntity.start = this.task.start;
+    taskEntity.end = this.task.end;
     taskEntity.status = this.task.status;
     taskEntity.userId = this.task.userId;
+    taskEntity.createdAt = this.task.createdAt;
+    taskEntity.updatedAt = this.task.updatedAt;
 
     return taskEntity;
   }
@@ -33,27 +36,13 @@ export class TaskAdapter {
       id: this.task.id,
       title: this.task.title,
       description: this.task.description,
-      dueDate: this.task.dueDate,
+      start: this.task.start,
+      end: this.task.end,
       status: this.task.status,
       userId: this.task.userId,
       createdAt: this.task.createdAt,
       updatedAt: this.task.updatedAt,
     };
-  }
-
-  public static fromResponseDto(json: TaskResponseDto): TaskAdapter {
-    return new TaskAdapter(
-      new Task({
-        id: json.id,
-        title: json.title,
-        description: json.description,
-        dueDate: json.dueDate,
-        status: json.status,
-        userId: json.userId,
-        createdAt: json.createdAt,
-        updatedAt: json.updatedAt,
-      }),
-    );
   }
 
   public static fromEntity(taskEntity: TaskEntity): TaskAdapter {
@@ -62,7 +51,8 @@ export class TaskAdapter {
         id: taskEntity.id,
         title: taskEntity.title,
         description: taskEntity.description,
-        dueDate: taskEntity.dueDate,
+        start: taskEntity.start,
+        end: taskEntity.end,
         status: taskEntity.status,
         userId: taskEntity.userId,
         createdAt: taskEntity.createdAt,

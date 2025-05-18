@@ -4,6 +4,7 @@ export type TaskCreateProps = {
   title: string;
   description: string;
   userId: string;
-  dueDate: Date;
+  start: Date;
+  end: Date;
   status?: TaskStatus;
 };

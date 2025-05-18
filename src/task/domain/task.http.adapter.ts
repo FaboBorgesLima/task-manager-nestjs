@@ -1,4 +1,4 @@
-import { DateRange } from 'src/types/domain/date-range';
+import { DateRange } from '../../types/domain/date-range';
 import { Task } from './task';
 import { TaskCreateProps } from './types/task-create-props';
 import { TaskUpdateProps } from './types/task-update-props';

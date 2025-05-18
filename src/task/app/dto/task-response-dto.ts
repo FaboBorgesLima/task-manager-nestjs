@@ -22,14 +22,20 @@ export class TaskResponseDto {
   description?: string;
 
   @ApiProperty({
-    description: 'The due date of the task',
-    example: '2023-10-01T00:00:00.000Z',
+    description: 'The start date of the task',
+    example: '2023-10-01T00:00:00Z',
   })
-  dueDate: Date;
+  start: Date;
+
+  @ApiProperty({
+    description: 'The end date of the task',
+    example: '2023-10-01T00:00:00Z',
+  })
+  end: Date;
 
   @ApiProperty({
     enum: TaskStatus,
-    enumName: 'TaskStatus',
+    default: TaskStatus.PENDING,
     description: 'The status of the task',
     example: TaskStatus.PENDING,
   })

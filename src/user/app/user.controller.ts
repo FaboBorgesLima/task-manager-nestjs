@@ -12,7 +12,7 @@ import {
   Put,
   UseInterceptors,
 } from '@nestjs/common';
-import { UserServiceInterface } from '../domain/user.service.interface';
+import { UserRepositoryInterface } from '../domain/user.repository.interface';
 import { User } from '../domain/user';
 import { UserCreateDto } from './dtos/user-create-dto';
 import { UserUpdateDto } from './dtos/user-update-dto';
@@ -33,8 +33,8 @@ import { BigIntPipe } from '../../big-int/big-int.pipe';
 @Controller('users')
 export class UserController implements UserHttpAdapter {
   constructor(
-    @Inject(UserServiceInterface)
-    private readonly userService: UserServiceInterface,
+    @Inject(UserRepositoryInterface)
+    private readonly userService: UserRepositoryInterface,
     @Inject(AbstractAuthService)
     private readonly authService: AbstractAuthService,
     @Inject(HashServiceInterface)

@@ -4,7 +4,7 @@ import { AppModule } from '../src/app.module';
 import { AbstractAuthService } from '../src/auth/domain/abstract-auth.service';
 import typeormModule from '../src/database/typeorm.module';
 import { User } from '../src/user/domain/user';
-import { UserServiceInterface } from '../src/user/domain/user.service.interface';
+import { UserRepositoryInterface } from '../src/user/domain/user.repository.interface';
 import * as request from 'supertest';
 import { clearDatabase } from './helpers/clearDatabase';
 import { TaskResponseDto } from '../src/task/app/dto/task-response-dto';
@@ -14,12 +14,13 @@ import {
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
 import { HttpStatus } from '@nestjs/common';
+import { bootstrap } from '../src/bootstrap';
 
 describe('TaskController (e2e)', () => {
   let app: NestFastifyApplication;
   let token: string;
   let user: User;
-  let userService: UserServiceInterface;
+  let userService: UserRepositoryInterface;
   let authService: AbstractAuthService;
   let hashService: HashServiceInterface;
 
@@ -31,11 +32,14 @@ describe('TaskController (e2e)', () => {
     app = moduleFixture.createNestApplication<NestFastifyApplication>(
       new FastifyAdapter(),
     );
+    await bootstrap(app);
 
     await app.init();
     await app.getHttpAdapter().getInstance().ready();
 
-    userService = moduleFixture.get<UserServiceInterface>(UserServiceInterface);
+    userService = moduleFixture.get<UserRepositoryInterface>(
+      UserRepositoryInterface,
+    );
     authService = moduleFixture.get<AbstractAuthService>(AbstractAuthService);
     hashService = moduleFixture.get<HashServiceInterface>(HashServiceInterface);
     user = User.create(
@@ -58,7 +62,8 @@ describe('TaskController (e2e)', () => {
       .send({
         title: 'Test Task',
         description: 'This is a test task',
-        dueDate: new Date(),
+        start: new Date(),
+        end: new Date(),
       })
       .expect(201);
 
@@ -88,7 +93,8 @@ describe('TaskController (e2e)', () => {
       .send({
         title: 'Test Task',
         description: 'This is a test task',
-        dueDate: new Date(),
+        start: new Date(),
+        end: new Date(),
       })
       .expect(201);
 
@@ -111,7 +117,8 @@ describe('TaskController (e2e)', () => {
       .send({
         title: 'Test Task',
         description: 'This is a test task',
-        dueDate: new Date(),
+        start: new Date(),
+        end: new Date(),
       })
       .expect(201);
     const createResponseBody = createResponse.body as TaskResponseDto;
@@ -123,7 +130,8 @@ describe('TaskController (e2e)', () => {
         status: 'completed',
         title: 'Updated Task',
         description: 'This is an updated test task',
-        dueDate: new Date(),
+        start: new Date(),
+        end: new Date(),
       });
 
     expect(response.status).toBe(200);
@@ -144,7 +152,8 @@ describe('TaskController (e2e)', () => {
       .send({
         title: 'Test Task',
         description: 'This is a test task',
-        dueDate: new Date(),
+        start: new Date(),
+        end: new Date(),
       })
       .expect(201);
     const createResponseBody = createResponse.body as TaskResponseDto;

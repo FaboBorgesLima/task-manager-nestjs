@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { AbstractAuthService } from '../../domain/abstract-auth.service';
-import { UserServiceInterface } from '../../../user/domain/user.service.interface';
+import { UserRepositoryInterface } from '../../../user/domain/user.repository.interface';
 import { User } from '../../../user/domain/user';
 import { JwtService } from '@nestjs/jwt';
 import { AuthTokenUserAdapter } from '../auth-token-user-adapter';
@@ -9,7 +9,8 @@ import { AuthToken } from '../auth-token';
 @Injectable()
 export class AuthJwtService extends AbstractAuthService {
   constructor(
-    @Inject(UserServiceInterface) private userService: UserServiceInterface,
+    @Inject(UserRepositoryInterface)
+    private userService: UserRepositoryInterface,
     private jwtService: JwtService,
   ) {
     super();

@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { User } from '../../domain/user';
-import { UserServiceInterface } from '../../domain/user.service.interface';
+import { UserRepositoryInterface } from '../../domain/user.repository.interface';
 import { randomUUID } from 'crypto';
 
 @Injectable()
-export class UserMemoryService implements UserServiceInterface {
+export class UserMemoryService implements UserRepositoryInterface {
   private static users: User[] = [];
 
   constructor() {}

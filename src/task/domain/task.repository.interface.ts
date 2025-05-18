@@ -1,6 +1,6 @@
 import { Task } from './task';
 
-export interface TaskServiceInterface {
+export interface TaskRepositoryInterface {
   save(task: Task): Promise<Task>;
   findById(id: string): Promise<Task | void>;
   findByUser(userId: string): Promise<Task[]>;
@@ -12,4 +12,4 @@ export interface TaskServiceInterface {
   delete(id: string): Promise<void>;
 }
 
-export const TaskServiceInterface = Symbol('TaskServiceInterface');
+export const TaskRepositoryInterface = Symbol('TaskRepositoryInterface');

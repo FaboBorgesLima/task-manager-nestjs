@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserController } from './user.controller';
 import { UserMemoryService } from '../infra/services/user-memory.service';
-import { UserServiceInterface } from '../domain/user.service.interface';
+import { UserRepositoryInterface } from '../domain/user.repository.interface';
 import { AbstractAuthService } from '../../auth/domain/abstract-auth.service';
 import { AuthJwtService } from '../../auth/infra/services/auth-jwt.service';
 import { JwtModule } from '@nestjs/jwt';
@@ -20,7 +20,7 @@ describe('UserController', () => {
           useClass: AuthJwtService,
         },
         {
-          provide: UserServiceInterface,
+          provide: UserRepositoryInterface,
           useClass: UserMemoryService,
         },
         {
