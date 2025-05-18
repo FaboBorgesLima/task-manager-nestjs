@@ -1,5 +1,5 @@
-import { TaskCreateProps } from '../../domain/types/task-create-props';
-import { TaskStatus } from '../../domain/task-status.enum';
+import { TaskCreateProps } from '@faboborgeslima/task-manager-domain/task/types';
+import { TaskStatus } from '@faboborgeslima/task-manager-domain/task';
 import { IsDate, IsEnum, IsOptional, IsString } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';

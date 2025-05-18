@@ -1,8 +1,8 @@
-import { faker } from '@faker-js/faker/.';
-import { User } from '../user/domain/user';
+import { faker } from '@faker-js/faker';
+import { User } from '@faboborgeslima/task-manager-domain/user';
 import { UserMemoryService } from '../user/infra/services/user-memory.service';
 import { UserByIdPipe } from './user-by-id.pipe';
-import { HashMockService } from '../hash/app/hash-mock.service';
+import { HashMockService } from '@faboborgeslima/task-manager-domain/hash';
 
 describe('UserByIdPipe', () => {
   const userService = new UserMemoryService();

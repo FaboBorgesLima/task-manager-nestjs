@@ -12,13 +12,15 @@ import {
   Put,
   UseInterceptors,
 } from '@nestjs/common';
-import { UserRepositoryInterface } from '../domain/user.repository.interface';
-import { User } from '../domain/user';
+import {
+  UserRepositoryInterface,
+  UserHttpAdapter,
+  User,
+} from '@faboborgeslima/task-manager-domain/user';
+import { AbstractAuthService } from '@faboborgeslima/task-manager-domain/auth';
+import { HashServiceInterface } from '@faboborgeslima/task-manager-domain/hash';
 import { UserCreateDto } from './dtos/user-create-dto';
 import { UserUpdateDto } from './dtos/user-update-dto';
-import { AbstractAuthService } from '../../auth/domain/abstract-auth.service';
-import { UserHttpAdapter } from '../domain/user.http.adapter';
-import { HashServiceInterface } from '../../hash/domain/hash.service.interface';
 import {
   ApiBodyUserResponseInterceptor,
   UserResponseInterceptor,

@@ -1,8 +1,8 @@
 import { AppModule } from '../src/app.module';
 import typeormModule from '../src/database/typeorm.module';
-import * as request from 'supertest';
+import request from 'supertest';
 import { Test, TestingModule } from '@nestjs/testing';
-import { faker } from '@faker-js/faker/.';
+import { faker } from '@faker-js/faker';
 import { clearDatabase } from './helpers/clearDatabase';
 import {
   FastifyAdapter,

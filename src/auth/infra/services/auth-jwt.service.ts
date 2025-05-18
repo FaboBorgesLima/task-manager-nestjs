@@ -1,7 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { AbstractAuthService } from '../../domain/abstract-auth.service';
-import { UserRepositoryInterface } from '../../../user/domain/user.repository.interface';
-import { User } from '../../../user/domain/user';
+import { AbstractAuthService } from '@faboborgeslima/task-manager-domain/auth';
+import {
+  UserRepositoryInterface,
+  User,
+} from '@faboborgeslima/task-manager-domain/user';
 import { JwtService } from '@nestjs/jwt';
 import { AuthTokenUserAdapter } from '../auth-token-user-adapter';
 import { AuthToken } from '../auth-token';

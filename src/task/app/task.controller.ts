@@ -12,21 +12,25 @@ import {
   UnauthorizedException,
   UseInterceptors,
 } from '@nestjs/common';
-import { TaskRepositoryInterface } from '../domain/task.repository.interface';
-import { Task } from '../domain/task';
 import { TaskUpdateDto } from './dto/task-update-dto';
 import { TaskCreateDTO } from './dto/task-create-dto';
 import { ApiBearerAuth, ApiOkResponse, ApiParam } from '@nestjs/swagger';
 import { TaskResponseDto } from './dto/task-response-dto';
 import { TaskListResponseDto } from './dto/task-list-response-dto';
-import { TaskHttpAdapter } from '../domain/task.http.adapter';
+import {
+  TaskHttpAdapter,
+  Task,
+  TaskRepositoryInterface,
+} from '@faboborgeslima/task-manager-domain/task';
 import { DateRangeDto } from '../../types/app/date-range-dto';
-import { UserRepositoryInterface } from '../../user/domain/user.repository.interface';
 import { TaskResponseInterceptor } from './interceptors/task-response.interceptor';
 import { TaskListResponseInterceptor } from './interceptors/task-list-response.interceptor';
 import { BigIntPipe } from '../../big-int/big-int.pipe';
 import { Auth } from '../../auth/app/decorators/auth.decorator';
-import { User } from '../../user/domain/user';
+import {
+  User,
+  UserRepositoryInterface,
+} from '@faboborgeslima/task-manager-domain/user';
 
 @Controller('tasks')
 @ApiBearerAuth()

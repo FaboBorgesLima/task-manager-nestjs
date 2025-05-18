@@ -1,7 +1,7 @@
 import { Type } from 'class-transformer';
 import { IsEnum, IsOptional, IsString } from 'class-validator';
-import { TaskUpdateProps } from '../../domain/types/task-update-props';
-import { TaskStatus } from '../../domain/task-status.enum';
+import { TaskUpdateProps } from '@faboborgeslima/task-manager-domain/task/types';
+import { TaskStatus } from '@faboborgeslima/task-manager-domain/task';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class TaskUpdateDto implements TaskUpdateProps {

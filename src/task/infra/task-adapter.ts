@@ -1,4 +1,4 @@
-import { Task } from '../domain/task';
+import { Task } from '@faboborgeslima/task-manager-domain/task';
 import { TaskResponseDto } from '../app/dto/task-response-dto';
 import { TaskEntity } from './task.entity';
 

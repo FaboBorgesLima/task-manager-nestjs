@@ -1,6 +1,6 @@
 import { HttpStatus, Inject, Injectable, NestMiddleware } from '@nestjs/common';
 import { IncomingMessage, ServerResponse } from 'http';
-import { AbstractAuthService } from '../../domain/abstract-auth.service';
+import { AbstractAuthService } from '@faboborgeslima/task-manager-domain/auth';
 
 @Injectable()
 export class AuthMiddleware implements NestMiddleware {

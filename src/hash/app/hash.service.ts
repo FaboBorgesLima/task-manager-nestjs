@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { createHmac } from 'crypto';
-import { HashServiceInterface } from '../domain/hash.service.interface';
+import { HashServiceInterface } from '@faboborgeslima/task-manager-domain/hash';
 
 @Injectable()
 export class HashService implements HashServiceInterface {

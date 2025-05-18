@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { TaskStatus } from '../../domain/task-status.enum';
+import { TaskStatus } from '@faboborgeslima/task-manager-domain/task';
 
 export class TaskResponseDto {
   @ApiProperty({

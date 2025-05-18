@@ -1,7 +1,7 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { TaskController } from './task.controller';
 import { SharedModule } from '../../shared/shared.module';
-import { TaskRepositoryInterface } from '../domain/task.repository.interface';
+import { TaskRepositoryInterface } from '@faboborgeslima/task-manager-domain/task';
 import { TaskTypeORMRepository } from '../infra/services/task-typorm.repository';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TaskEntity } from '../infra/task.entity';

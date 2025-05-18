@@ -1,6 +1,6 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import { FastifyRequest } from 'fastify';
-import { User } from '../../../user/domain/user';
+import { User } from '@faboborgeslima/task-manager-domain/user';
 
 export const Auth = createParamDecorator(
   (data: unknown, ctx: ExecutionContext) => {
