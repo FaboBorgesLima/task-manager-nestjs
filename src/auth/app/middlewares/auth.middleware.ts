@@ -32,7 +32,7 @@ export class AuthMiddleware implements NestMiddleware {
     try {
       const auth = await this.authService.fromToken(authToken);
       user = auth.user;
-    } catch (error) {
+    } catch {
       res.writeHead(HttpStatus.UNAUTHORIZED, {
         'Content-Type': 'application/json',
       });

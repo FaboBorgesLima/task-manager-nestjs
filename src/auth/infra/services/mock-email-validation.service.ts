@@ -6,11 +6,12 @@ export class MockEmailValidationService
   implements EmailValidationServiceInterface
 {
   static readonly VALIDATION_CODE = '123456';
-  sendValidation(email: string): Promise<void> {
+
+  sendValidation(): Promise<void> {
     return Promise.resolve();
   }
 
-  checkValidation(email: string, validation: string): Promise<boolean> {
+  checkValidation(_email: string, validation: string): Promise<boolean> {
     // Mock implementation: always return true if validation matches
     return Promise.resolve(
       validation === MockEmailValidationService.VALIDATION_CODE,

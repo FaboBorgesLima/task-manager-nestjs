@@ -3,10 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from '../src/app.module';
 import { AuthService } from '../src/auth/app/auth.service';
 import typeormModule from '../src/database/typeorm.module';
-import {
-  User,
-  UserRepositoryInterface,
-} from '@faboborgeslima/task-manager-domain/user';
+import { User } from '@faboborgeslima/task-manager-domain/user';
 import request from 'supertest';
 import { clearDatabase } from './helpers/clearDatabase';
 import { TaskResponseDto } from '../src/task/app/dto/task-response-dto';
@@ -23,7 +20,6 @@ describe('TaskController (e2e)', () => {
   let app: NestFastifyApplication;
   let token: string;
   let user: User;
-  let userService: UserRepositoryInterface;
   let authService: AuthService;
 
   beforeEach(async () => {
@@ -43,9 +39,6 @@ describe('TaskController (e2e)', () => {
     await app.init();
     await app.getHttpAdapter().getInstance().ready();
 
-    userService = moduleFixture.get<UserRepositoryInterface>(
-      UserRepositoryInterface,
-    );
     authService = moduleFixture.get<AuthService>(AuthService);
 
     user = new User({

@@ -27,11 +27,11 @@ export class AuthJwtRespository implements AuthRepositoryInterface {
     //
   }
 
-  async fromUser(user: User): Promise<Auth> {
-    return {
+  fromUser(user: User): Promise<Auth> {
+    return Promise.resolve({
       user,
       token: this.jwtService.sign(UserAdapter.fromDomain(user).toResponseDTO()),
-    };
+    });
   }
 
   async login(validate: AuthCredentials): Promise<Auth> {
@@ -69,7 +69,7 @@ export class AuthJwtRespository implements AuthRepositoryInterface {
     return { token, user: userDomain };
   }
 
-  async fromToken(token: string): Promise<Auth> {
+  fromToken(token: string): Promise<Auth> {
     if (!token) {
       throw new BadRequestException('Token is required');
     }
@@ -80,9 +80,9 @@ export class AuthJwtRespository implements AuthRepositoryInterface {
     const jwtToken = tokenParts[1];
     const decoded = this.jwtService.verify<UserResponseDto>(jwtToken);
 
-    return {
+    return Promise.resolve({
       user: UserAdapter.fromResponseDTO(decoded).toDomain(),
       token: jwtToken,
-    };
+    });
   }
 }

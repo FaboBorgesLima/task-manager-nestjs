@@ -46,7 +46,7 @@ export class AuthController {
   public async login(@Body() body: AuthLoginDto) {
     try {
       return await this.authService.login(body);
-    } catch (e) {
+    } catch {
       throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
     }
   }
@@ -62,7 +62,7 @@ export class AuthController {
 
     try {
       return await this.authService.register(user, body, body.validation);
-    } catch (e) {
+    } catch {
       throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
     }
   }
@@ -91,7 +91,7 @@ export class AuthController {
 
     try {
       auth = await this.authService.fromToken(authorization);
-    } catch (e) {
+    } catch {
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
 

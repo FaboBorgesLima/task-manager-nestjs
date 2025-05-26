@@ -1,5 +1,4 @@
 import {
-  Body,
   Controller,
   Delete,
   Get,
@@ -28,7 +27,7 @@ export class UserController {
     @Inject(UserRepositoryInterface)
     private readonly userService: UserRepositoryInterface,
     @Inject(AuthRepositoryInterface)
-    private readonly authRepository: AuthRepositoryInterface,
+    private readonly authService: AuthService,
   ) {}
 
   @Get(':id')
@@ -50,7 +49,7 @@ export class UserController {
     @Headers('Authorization') authorization: string,
   ) {
     const [auth, user] = await Promise.all([
-      this.authRepository.fromToken(authorization),
+      this.authService.fromToken(authorization),
       this.userService.findOne(id),
     ]);
     if (!auth) {
@@ -99,7 +98,7 @@ export class UserController {
     @Headers('Authorization') authorization: string,
   ) {
     const [auth, user] = await Promise.all([
-      this.authRepository.fromToken(authorization),
+      this.authService.fromToken(authorization),
       this.userService.findOne(id),
     ]);
 

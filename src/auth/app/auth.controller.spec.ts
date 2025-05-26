@@ -55,7 +55,7 @@ describe('AuthController', () => {
   });
 
   it('should throw an error if email is not valid', async () => {
-    expect(
+    await expect(
       controller.register({
         name: faker.person.fullName(),
         email: faker.internet.email(),

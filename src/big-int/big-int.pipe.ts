@@ -11,8 +11,7 @@ export class BigIntPipe implements PipeTransform {
     try {
       BigInt(String(value));
       return String(value);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (e) {
+    } catch {
       throw new HttpException(
         `Invalid value for BigInt in ${metadata.type}.${metadata.data ? metadata.data : 'unknown'}: ${String(value)}`,
         400,
