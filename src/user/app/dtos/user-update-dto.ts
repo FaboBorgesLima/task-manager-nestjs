@@ -6,8 +6,4 @@ export class UserUpdateDto implements UserUpdateProps {
   @ApiProperty()
   @IsString()
   name: string;
-
-  @ApiProperty()
-  @IsString()
-  password: string;
 }

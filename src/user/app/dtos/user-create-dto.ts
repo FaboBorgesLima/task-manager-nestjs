@@ -18,12 +18,4 @@ export class UserCreateDto implements UserCreateProps {
   })
   @IsEmail()
   email: string;
-
-  @ApiProperty({
-    description: 'User password',
-    example: 'password123',
-    required: true,
-  })
-  @IsString()
-  password: string;
 }

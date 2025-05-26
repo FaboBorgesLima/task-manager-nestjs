@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsString } from 'class-validator';
-import { AuthLoginProps } from '@faboborgeslima/task-manager-domain/auth/types';
+import { AuthCredentials } from '@faboborgeslima/task-manager-domain/auth/types';
 
-export class AuthLoginDto implements AuthLoginProps {
+export class AuthLoginDto implements AuthCredentials {
   @ApiProperty({
     description: 'User email address',
     example: 'user@example.com',

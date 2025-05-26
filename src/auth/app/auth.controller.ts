@@ -10,31 +10,26 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { AuthLoginDto } from './dtos/auth-login.dto';
-import { HashService } from '../../hash/app/hash.service';
-import {
-  AuthHttpAdapter,
-  AbstractAuthService,
-} from '@faboborgeslima/task-manager-domain/auth';
-import { HashServiceInterface } from '@faboborgeslima/task-manager-domain/hash';
 import {
   ApiBodyUserTokenResponseInterceptor,
   UserTokenResponseInterceptor,
 } from '../../user/app/interceptors/user-token-reponse.interceptor';
-import { UserResponseInterceptor } from '../../user/app/interceptors/user-response.interceptor';
 import {
   ApiBearerAuth,
   ApiBody,
   ApiHeaders,
   ApiResponse,
 } from '@nestjs/swagger';
+import { AuthService } from './auth.service';
+import { User } from '@faboborgeslima/task-manager-domain/user';
+import { AuthRegisterDto } from './dtos/auth-register.dto';
+import { Auth } from '@faboborgeslima/task-manager-domain/auth';
 
 @Controller('auth')
-export class AuthController implements AuthHttpAdapter {
+export class AuthController {
   public constructor(
-    @Inject(AbstractAuthService)
-    private readonly authService: AbstractAuthService,
-    @Inject(HashServiceInterface)
-    private readonly hashMaker: HashService,
+    @Inject(AuthService)
+    private readonly authService: AuthService,
   ) {}
 
   @Post('/login')
@@ -49,24 +44,30 @@ export class AuthController implements AuthHttpAdapter {
     type: ApiBodyUserTokenResponseInterceptor,
   })
   public async login(@Body() body: AuthLoginDto) {
-    const { email, password } = body;
-
-    const user = await this.authService.findByEmailPassword(
-      email,
-      this.hashMaker.make(password),
-    );
-
-    if (!user) {
-      throw new HttpException(
-        'Invalid email or password',
-        HttpStatus.UNAUTHORIZED,
-      );
+    try {
+      return await this.authService.login(body);
+    } catch {
+      throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
     }
-
-    return this.authService.toTokenAndUser(user);
   }
 
-  @UseInterceptors(UserResponseInterceptor)
+  @Post('/register')
+  @UseInterceptors(UserTokenResponseInterceptor)
+  @ApiBody({
+    description: 'Register user',
+    type: AuthRegisterDto,
+  })
+  public async register(@Body() body: AuthRegisterDto) {
+    const user = new User(body);
+
+    try {
+      return await this.authService.register(user, body, body.validation);
+    } catch {
+      throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
+    }
+  }
+
+  @UseInterceptors(UserTokenResponseInterceptor)
   @Get('/me')
   @ApiBearerAuth()
   @ApiHeaders([
@@ -86,11 +87,14 @@ export class AuthController implements AuthHttpAdapter {
     @Headers('Authorization')
     authorization: string,
   ) {
-    const user = await this.authService.getUserFromHeader(authorization);
-    if (!user) {
+    let auth: Auth;
+
+    try {
+      auth = await this.authService.fromToken(authorization);
+    } catch {
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
 
-    return user;
+    return auth;
   }
 }

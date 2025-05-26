@@ -10,6 +10,8 @@ import {
   FastifyAdapter,
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
+import { EmailValidationServiceInterface } from '@faboborgeslima/task-manager-domain/auth';
+import { MockEmailValidationService } from '../src/auth/infra/services/mock-email-validation.service';
 
 describe('UserController (e2e)', () => {
   let app: NestFastifyApplication;
@@ -17,36 +19,25 @@ describe('UserController (e2e)', () => {
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule, TypeormModule],
-    }).compile();
+    })
+      .overrideProvider(EmailValidationServiceInterface)
+      .useClass(MockEmailValidationService)
+      .compile();
 
     app = moduleFixture.createNestApplication(new FastifyAdapter());
     await app.init();
     await app.getHttpAdapter().getInstance().ready();
   });
 
-  it('/users (POST)', async () => {
-    const response = await request(app.getHttpServer()).post('/users').send({
-      name: faker.person.fullName(),
-      email: faker.internet.email(),
-      password: 'password123',
-    });
-
-    expect(response.status).toBe(201);
-    expect(response.body).toHaveProperty('user');
-    expect(response.body).toHaveProperty('user.name');
-    expect(response.body).toHaveProperty('user.email');
-
-    expect(response.body).toHaveProperty('token');
-  });
-
   it('/users/:id (GET)', async () => {
     const name = faker.person.fullName();
     const createResponse = await request(app.getHttpServer())
-      .post('/users')
+      .post('/auth/register')
       .send({
         name,
         email: faker.internet.email(),
         password: 'password123',
+        validation: MockEmailValidationService.VALIDATION_CODE,
       })
       .expect(201);
 
@@ -71,41 +62,14 @@ describe('UserController (e2e)', () => {
       .expect(HttpStatus.BAD_REQUEST);
   });
 
-  it('/users/:id (PUT)', async () => {
-    const createResponse = await request(app.getHttpServer())
-      .post('/users')
-      .send({
-        name: faker.person.fullName(),
-        email: faker.internet.email(),
-        password: 'password123',
-      })
-      .expect(201);
-    const { user, token } = createResponse.body as {
-      user: User;
-      token: string;
-    };
-
-    const userId = user.id;
-    const response = await request(app.getHttpServer())
-      .put(`/users/${userId}`)
-      .set('Authorization', `Bearer ${token}`)
-      .send({
-        name: faker.person.fullName(),
-      });
-    expect(response.status).toBe(200);
-
-    expect(response.body).toHaveProperty('user.name');
-    expect(response.body).toHaveProperty('user.id', userId);
-    expect(response.body).toHaveProperty('token');
-  });
-
   it('/users/:id (DELETE)', async () => {
     const createResponse = await request(app.getHttpServer())
-      .post('/users')
+      .post('/auth/register')
       .send({
         name: faker.person.fullName(),
         email: faker.internet.email(),
         password: 'password123',
+        validation: MockEmailValidationService.VALIDATION_CODE,
       })
       .expect(201);
     const { user, token } = createResponse.body as {

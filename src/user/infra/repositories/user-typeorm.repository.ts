@@ -9,7 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserAdapter } from '../user-adapter';
 
 @Injectable()
-export class UserTypeORMService implements UserRepositoryInterface {
+export class UserTypeormRepository implements UserRepositoryInterface {
   public constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
@@ -53,26 +53,5 @@ export class UserTypeORMService implements UserRepositoryInterface {
     }
 
     await this.userRepository.delete(id);
-  }
-
-  async findAll(): Promise<User[]> {
-    const users = await this.userRepository.find();
-    return users.map((user) => UserAdapter.fromPersistence(user).toDomain());
-  }
-
-  async findByEmailPassword(
-    email: string,
-    password: string,
-  ): Promise<User | void> {
-    const user = await this.userRepository.findOneBy({
-      email,
-      password,
-    });
-
-    if (!user) {
-      return;
-    }
-
-    return UserAdapter.fromPersistence(user).toDomain();
   }
 }

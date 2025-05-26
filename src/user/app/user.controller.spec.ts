@@ -1,40 +1,31 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserController } from './user.controller';
-import { UserMemoryService } from '../infra/services/user-memory.service';
-import { UserRepositoryInterface } from '@faboborgeslima/task-manager-domain/user';
-import { AbstractAuthService } from '@faboborgeslima/task-manager-domain/auth';
-import { AuthJwtService } from '../../auth/infra/services/auth-jwt.service';
-import { JwtModule } from '@nestjs/jwt';
+import { UserMemoryRepository } from '../infra/repositories/user-memory.repository';
 import {
-  HashMockService,
-  HashServiceInterface,
-} from '@faboborgeslima/task-manager-domain/hash';
+  User,
+  UserRepositoryInterface,
+} from '@faboborgeslima/task-manager-domain/user';
+import { AuthRepositoryInterface } from '@faboborgeslima/task-manager-domain/auth';
+import { AuthIdRepository } from '../../auth/infra/repositories/auth-id.repository';
+import { faker } from '@faker-js/faker';
 
 describe('UserController', () => {
   let controller: UserController;
+  const authRepository = new AuthIdRepository(new UserMemoryRepository());
+  const userRepository: UserRepositoryInterface = new UserMemoryRepository();
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UserController],
       providers: [
         {
-          provide: AbstractAuthService,
-          useClass: AuthJwtService,
+          provide: AuthRepositoryInterface,
+          useValue: new AuthIdRepository(userRepository),
         },
         {
           provide: UserRepositoryInterface,
-          useClass: UserMemoryService,
+          useValue: userRepository,
         },
-        {
-          provide: HashServiceInterface,
-          useClass: HashMockService,
-        },
-      ],
-      imports: [
-        JwtModule.register({
-          secret: 'test',
-          signOptions: { expiresIn: '10d' },
-        }),
       ],
     }).compile();
 
@@ -45,38 +36,23 @@ describe('UserController', () => {
     expect(controller).toBeDefined();
   });
 
-  it('should create a user', async () => {
-    const { user } = await controller.create({
-      name: 'John Doe',
-      email: 'john.doe@example.com',
-      password: 'password123',
-    });
-
-    if (!user) {
-      throw new Error('User not created');
-    }
-
-    expect(user).toBeDefined();
-    expect(user.name).toBe('John Doe');
-    expect(user.email).toBe('john.doe@example.com');
-    expect(user.id).toBeDefined();
-  });
-
   it('should find a user by id', async () => {
-    const { user, token } = await controller.create({
-      name: 'John Doe',
-      email: 'john.doe@example.com',
-      password: 'password123',
-    });
+    const { user, token } = await authRepository.register(
+      new User({
+        name: 'Test User',
+        email: faker.internet.email(),
+      }),
+      {
+        email: faker.internet.email(),
+        password: 'password123',
+      },
+    );
 
     if (!user) {
       throw new Error('User not found');
     }
 
-    const foundUser = await controller.findOne(
-      user.id as string,
-      `Bearer ${token}`,
-    );
+    const foundUser = await controller.findOne(user.id as string, token);
 
     if (!foundUser) {
       throw new Error('User not found');
@@ -86,40 +62,22 @@ describe('UserController', () => {
     expect(foundUser.id).toBe(user.id as string);
   });
 
-  it('should update a user', async () => {
-    const { token, user } = await controller.create({
-      name: 'John Doe',
-      email: 'john.doe@example.com',
-      password: 'password123',
-    });
-
-    const updateResponse = await controller.update(
-      user.id as string,
-      {
-        name: 'Jane Doe',
-        password: 'newpassword123',
-      },
-      `Bearer ${token}`,
-    );
-
-    if (!updateResponse) {
-      throw new Error('User not updated');
-    }
-
-    expect(updateResponse.user.name).toBe('Jane Doe');
-    expect(updateResponse.user.password).not.toBe('newpassword123');
-  });
-
   it('should delete a user', async () => {
-    const { user, token } = await controller.create({
-      name: 'John Doe',
-      email: 'joe@example.com',
-      password: 'password123',
-    });
+    const email = faker.internet.email();
+    const { user, token } = await authRepository.register(
+      new User({
+        name: 'Test User',
+        email: email,
+      }),
+      {
+        email: email,
+        password: 'password123',
+      },
+    );
     if (!user.id) {
       throw new Error('User not created');
     }
 
-    await controller.delete(user.id, `Bearer ${token}`);
+    await controller.delete(user.id, token);
   });
 });

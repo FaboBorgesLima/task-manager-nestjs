@@ -1,15 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
 import { UserRepositoryInterface } from '@faboborgeslima/task-manager-domain/user';
-import { UserMemoryService } from '../../user/infra/services/user-memory.service';
-import { User } from '@faboborgeslima/task-manager-domain/user';
-import { AbstractAuthService } from '@faboborgeslima/task-manager-domain/auth';
-import { AuthJwtService } from '../infra/services/auth-jwt.service';
-import { JwtModule } from '@nestjs/jwt';
+import { UserMemoryRepository } from '../../user/infra/repositories/user-memory.repository';
 import {
-  HashMockService,
-  HashServiceInterface,
-} from '@faboborgeslima/task-manager-domain/hash';
+  AuthRepositoryInterface,
+  EmailValidationServiceInterface,
+} from '@faboborgeslima/task-manager-domain/auth';
+import { AuthIdRepository } from '../infra/repositories/auth-id.repository';
+import { faker } from '@faker-js/faker';
+import { AuthService } from './auth.service';
+import { MockEmailValidationService } from '../infra/services/mock-email-validation.service';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -18,25 +18,21 @@ describe('AuthController', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AuthController],
       providers: [
+        AuthService,
         {
           provide: UserRepositoryInterface,
-          useClass: UserMemoryService,
+          useValue: new UserMemoryRepository(),
         },
         {
-          provide: AbstractAuthService,
-          useClass: AuthJwtService,
+          provide: AuthRepositoryInterface,
+          useValue: new AuthIdRepository(new UserMemoryRepository()),
         },
         {
-          provide: HashServiceInterface,
-          useClass: HashMockService,
+          provide: EmailValidationServiceInterface,
+          useClass: MockEmailValidationService,
         },
       ],
-      imports: [
-        JwtModule.register({
-          secret: 'test',
-          signOptions: { expiresIn: '10d' },
-        }),
-      ],
+      imports: [],
     }).compile();
 
     controller = module.get<AuthController>(AuthController);
@@ -46,56 +42,43 @@ describe('AuthController', () => {
     expect(controller).toBeDefined();
   });
 
-  it('should login a user', async () => {
-    const userRepository = new UserMemoryService();
-
-    await expect(
-      controller.login({
-        email: 'test@example.com',
-        password: 'password123',
-      }),
-    ).rejects.toThrow();
-
-    const user = User.create(
-      {
-        name: 'John Doe',
-        email: 'test@example.com',
-        password: 'password123',
-      },
-      HashMockService.getInstance(),
-    );
-
-    await userRepository.saveOne(user);
-
-    const loggedInUser = await controller.login({
-      email: 'test@example.com',
+  it('should register a user', async () => {
+    const result = await controller.register({
+      name: faker.person.fullName(),
+      email: faker.internet.email(),
       password: 'password123',
+      validation: MockEmailValidationService.VALIDATION_CODE,
     });
 
-    expect(loggedInUser).toBeDefined();
+    expect(result.token).toBeDefined();
+    expect(result.user).toBeDefined();
   });
 
-  it('should return user from token', async () => {
-    const userRepository = new UserMemoryService();
-    const user = User.create(
-      {
-        name: 'John Doe',
-        email: 'test@testeee.com',
+  it('should throw an error if email is not valid', async () => {
+    await expect(
+      controller.register({
+        name: faker.person.fullName(),
+        email: faker.internet.email(),
         password: 'password123',
-      },
-      HashMockService.getInstance(),
-    );
-    await userRepository.saveOne(user);
+        validation: 'invalid-validation',
+      }),
+    ).rejects.toThrow(Error);
+  });
 
-    const { token } = await controller.login({
-      email: 'test@testeee.com',
+  it('should login a user', async () => {
+    const { user } = await controller.register({
+      name: faker.person.fullName(),
+      email: faker.internet.email(),
+      password: 'password123',
+      validation: MockEmailValidationService.VALIDATION_CODE,
+    });
+
+    const result = await controller.login({
+      email: user.email,
       password: 'password123',
     });
 
-    expect(token).toBeDefined();
-    const userFromToken = await controller.me(`Bearer ${token}`);
-
-    expect(userFromToken).toBeDefined();
-    expect(userFromToken.email).toBe('test@testeee.com');
+    expect(result.token).toBeDefined();
+    expect(result.user).toBeDefined();
   });
 });

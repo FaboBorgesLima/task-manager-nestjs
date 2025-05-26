@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { DateRange } from '../domain/date-range';
+import { DateRange } from '@faboborgeslima/task-manager-domain/types';
 import { Type } from 'class-transformer';
 
 export class DateRangeDto implements DateRange {

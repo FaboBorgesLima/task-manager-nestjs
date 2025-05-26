@@ -1,5 +1,4 @@
 import {
-  Body,
   Controller,
   Delete,
   Get,
@@ -8,59 +7,28 @@ import {
   HttpStatus,
   Inject,
   Param,
-  Post,
-  Put,
   UseInterceptors,
 } from '@nestjs/common';
-import {
-  UserRepositoryInterface,
-  UserHttpAdapter,
-  User,
-} from '@faboborgeslima/task-manager-domain/user';
-import { AbstractAuthService } from '@faboborgeslima/task-manager-domain/auth';
-import { HashServiceInterface } from '@faboborgeslima/task-manager-domain/hash';
-import { UserCreateDto } from './dtos/user-create-dto';
+import { UserRepositoryInterface } from '@faboborgeslima/task-manager-domain/user';
+import { AuthRepositoryInterface } from '@faboborgeslima/task-manager-domain/auth';
+import { AuthService } from '../../auth/app/auth.service';
 import { UserUpdateDto } from './dtos/user-update-dto';
 import {
   ApiBodyUserResponseInterceptor,
   UserResponseInterceptor,
 } from './interceptors/user-response.interceptor';
 import { ApiBearerAuth, ApiBody, ApiParam, ApiResponse } from '@nestjs/swagger';
-import {
-  ApiBodyUserTokenResponseInterceptor,
-  UserTokenResponseInterceptor,
-} from './interceptors/user-token-reponse.interceptor';
+import { ApiBodyUserTokenResponseInterceptor } from './interceptors/user-token-reponse.interceptor';
 import { BigIntPipe } from '../../big-int/big-int.pipe';
 
 @Controller('users')
-export class UserController implements UserHttpAdapter {
+export class UserController {
   constructor(
     @Inject(UserRepositoryInterface)
     private readonly userService: UserRepositoryInterface,
-    @Inject(AbstractAuthService)
-    private readonly authService: AbstractAuthService,
-    @Inject(HashServiceInterface)
-    private readonly hashService: HashServiceInterface,
+    @Inject(AuthRepositoryInterface)
+    private readonly authService: AuthService,
   ) {}
-
-  @ApiBody({
-    description: 'Create a new user',
-    type: UserCreateDto,
-  })
-  @ApiResponse({
-    status: HttpStatus.CREATED,
-    description: 'User created successfully',
-    type: ApiBodyUserTokenResponseInterceptor,
-  })
-  @UseInterceptors(UserTokenResponseInterceptor)
-  @Post('/')
-  public async create(@Body() userCreateDto: UserCreateDto) {
-    const user = User.create(userCreateDto, this.hashService);
-
-    const savedUser = await this.userService.saveOne(user);
-
-    return this.authService.toTokenAndUser(savedUser);
-  }
 
   @Get(':id')
   @ApiParam({
@@ -80,18 +48,18 @@ export class UserController implements UserHttpAdapter {
     @Param('id', BigIntPipe) id: string,
     @Headers('Authorization') authorization: string,
   ) {
-    const [requestUser, user] = await Promise.all([
-      this.authService.getUserFromHeader(authorization),
+    const [auth, user] = await Promise.all([
+      this.authService.fromToken(authorization),
       this.userService.findOne(id),
     ]);
-    if (!requestUser) {
+    if (!auth) {
       throw new HttpException('Needs auth token', HttpStatus.UNAUTHORIZED);
     }
 
     if (!user) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
-    if (!requestUser.canSee(user)) {
+    if (!auth.user.canSee(user)) {
       throw new HttpException(
         'User not authorized to see',
         HttpStatus.FORBIDDEN,
@@ -117,35 +85,6 @@ export class UserController implements UserHttpAdapter {
     description: 'User updated successfully',
     type: ApiBodyUserTokenResponseInterceptor,
   })
-  @UseInterceptors(UserTokenResponseInterceptor)
-  @Put(':id')
-  public async update(
-    @Param('id', BigIntPipe) userId: string,
-    @Body() userUpdateDto: UserUpdateDto,
-    @Headers('Authorization') authorization: string,
-  ) {
-    const [requestUser, user] = await Promise.all([
-      this.authService.getUserFromHeader(authorization),
-      this.userService.findOne(userId),
-    ]);
-
-    if (!requestUser) {
-      throw new HttpException('Needs auth token', HttpStatus.UNAUTHORIZED);
-    }
-
-    if (!user) {
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
-    }
-
-    if (userUpdateDto.name) {
-      user.setName(userUpdateDto.name, requestUser);
-    }
-
-    return this.authService.toTokenAndUser(
-      await this.userService.saveOne(user),
-    );
-  }
-
   @ApiParam({
     name: 'id',
     description: 'User ID',
@@ -158,12 +97,12 @@ export class UserController implements UserHttpAdapter {
     @Param('id', BigIntPipe) id: string,
     @Headers('Authorization') authorization: string,
   ) {
-    const [requestUser, user] = await Promise.all([
-      this.authService.getUserFromHeader(authorization),
+    const [auth, user] = await Promise.all([
+      this.authService.fromToken(authorization),
       this.userService.findOne(id),
     ]);
 
-    if (!requestUser) {
+    if (!auth) {
       throw new HttpException('Needs auth token', HttpStatus.UNAUTHORIZED);
     }
 
@@ -171,7 +110,7 @@ export class UserController implements UserHttpAdapter {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
 
-    if (!user.canDelete(requestUser)) {
+    if (!auth.user.canDelete(user)) {
       throw new HttpException(
         'User not authorized to delete',
         HttpStatus.FORBIDDEN,

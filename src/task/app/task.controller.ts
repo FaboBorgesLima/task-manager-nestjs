@@ -18,7 +18,6 @@ import { ApiBearerAuth, ApiOkResponse, ApiParam } from '@nestjs/swagger';
 import { TaskResponseDto } from './dto/task-response-dto';
 import { TaskListResponseDto } from './dto/task-list-response-dto';
 import {
-  TaskHttpAdapter,
   Task,
   TaskRepositoryInterface,
 } from '@faboborgeslima/task-manager-domain/task';
@@ -34,7 +33,7 @@ import {
 
 @Controller('tasks')
 @ApiBearerAuth()
-export class TaskController implements TaskHttpAdapter {
+export class TaskController {
   public constructor(
     @Inject(TaskRepositoryInterface)
     private readonly taskRepository: TaskRepositoryInterface,
@@ -127,7 +126,7 @@ export class TaskController implements TaskHttpAdapter {
   ) {
     taskCreateDTO.userId = requestUser.id || '';
 
-    const task = await this.taskRepository.save(Task.create(taskCreateDTO));
+    const task = await this.taskRepository.save(Task.make(taskCreateDTO));
 
     return task;
   }
