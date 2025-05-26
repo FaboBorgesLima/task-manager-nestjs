@@ -1,12 +1,13 @@
 import { HttpStatus, Inject, Injectable, NestMiddleware } from '@nestjs/common';
 import { IncomingMessage, ServerResponse } from 'http';
-import { AbstractAuthService } from '@faboborgeslima/task-manager-domain/auth';
+import { AuthService } from '../auth.service';
+import { User } from '@faboborgeslima/task-manager-domain/user';
 
 @Injectable()
 export class AuthMiddleware implements NestMiddleware {
   public constructor(
-    @Inject(AbstractAuthService)
-    private readonly authService: AbstractAuthService,
+    @Inject(AuthService)
+    private readonly authService: AuthService,
   ) {
     //
   }
@@ -26,9 +27,12 @@ export class AuthMiddleware implements NestMiddleware {
       res.end();
       return;
     }
-    const user = await this.authService.getUserFromHeader(authToken);
+    let user: User;
 
-    if (!user) {
+    try {
+      const auth = await this.authService.fromToken(authToken);
+      user = auth.user;
+    } catch (error) {
       res.writeHead(HttpStatus.UNAUTHORIZED, {
         'Content-Type': 'application/json',
       });

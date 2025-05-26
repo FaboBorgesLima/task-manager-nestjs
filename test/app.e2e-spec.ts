@@ -7,6 +7,8 @@ import {
   FastifyAdapter,
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
+import { MockEmailValidationService } from '../src/auth/infra/services/mock-email-validation.service';
+import { EmailValidationServiceInterface } from '@faboborgeslima/task-manager-domain/auth';
 
 describe('AppController (e2e)', () => {
   let app: NestFastifyApplication;
@@ -14,7 +16,10 @@ describe('AppController (e2e)', () => {
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule, TypeormModule],
-    }).compile();
+    })
+      .overrideProvider(EmailValidationServiceInterface)
+      .useClass(MockEmailValidationService)
+      .compile();
 
     app = moduleFixture.createNestApplication(new FastifyAdapter());
     await app.init();

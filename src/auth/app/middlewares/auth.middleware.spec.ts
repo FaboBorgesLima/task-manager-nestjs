@@ -1,17 +1,17 @@
-import { AuthIdService } from '../../../auth/infra/services/auth-id.service';
+import { AuthIdRepository } from '../../infra/repositories/auth-id.repository';
 import { AuthMiddleware } from './auth.middleware';
-import { UserMemoryService } from '../../../user/infra/services/user-memory.service';
+import { UserMemoryRepository } from '../../../user/infra/repositories/user-memory.repository';
 import { createRequest, createResponse } from 'node-mocks-http';
 
 describe('AuthMiddleware', () => {
   it('should be defined', () => {
     expect(
-      new AuthMiddleware(new AuthIdService(new UserMemoryService())),
+      new AuthMiddleware(new AuthIdRepository(new UserMemoryRepository())),
     ).toBeDefined();
   });
   it('should return 401 if no auth token is provided', async () => {
     const middleware = new AuthMiddleware(
-      new AuthIdService(new UserMemoryService()),
+      new AuthIdRepository(new UserMemoryRepository()),
     );
     const req = createRequest({
       headers: {},

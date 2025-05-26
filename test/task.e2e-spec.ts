@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from '../src/app.module';
-import { AbstractAuthService } from '@faboborgeslima/task-manager-domain/auth';
+import { AuthService } from '../src/auth/app/auth.service';
 import typeormModule from '../src/database/typeorm.module';
 import {
   User,
@@ -10,30 +10,34 @@ import {
 import request from 'supertest';
 import { clearDatabase } from './helpers/clearDatabase';
 import { TaskResponseDto } from '../src/task/app/dto/task-response-dto';
-import { HashServiceInterface } from '@faboborgeslima/task-manager-domain/hash';
 import {
   FastifyAdapter,
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
 import { HttpStatus } from '@nestjs/common';
 import { bootstrap } from '../src/bootstrap';
+import { MockEmailValidationService } from '../src/auth/infra/services/mock-email-validation.service';
+import { EmailValidationServiceInterface } from '@faboborgeslima/task-manager-domain/auth';
 
 describe('TaskController (e2e)', () => {
   let app: NestFastifyApplication;
   let token: string;
   let user: User;
   let userService: UserRepositoryInterface;
-  let authService: AbstractAuthService;
-  let hashService: HashServiceInterface;
+  let authService: AuthService;
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule, typeormModule],
-    }).compile();
+    })
+      .overrideProvider(EmailValidationServiceInterface)
+      .useClass(MockEmailValidationService)
+      .compile();
 
     app = moduleFixture.createNestApplication<NestFastifyApplication>(
       new FastifyAdapter(),
     );
+
     bootstrap(app);
 
     await app.init();
@@ -42,19 +46,21 @@ describe('TaskController (e2e)', () => {
     userService = moduleFixture.get<UserRepositoryInterface>(
       UserRepositoryInterface,
     );
-    authService = moduleFixture.get<AbstractAuthService>(AbstractAuthService);
-    hashService = moduleFixture.get<HashServiceInterface>(HashServiceInterface);
-    user = User.create(
+    authService = moduleFixture.get<AuthService>(AuthService);
+
+    user = new User({
+      name: faker.person.fullName(),
+      email: faker.internet.email(),
+    });
+    const register = await authService.register(
+      user,
       {
-        name: faker.person.fullName(),
-        email: faker.internet.email(),
+        email: user.email,
         password: faker.internet.password(),
       },
-      hashService,
+      MockEmailValidationService.VALIDATION_CODE,
     );
-
-    user = await userService.saveOne(user);
-    token = await authService.toToken(user);
+    token = register.token;
   });
 
   it('/tasks (POST)', async () => {

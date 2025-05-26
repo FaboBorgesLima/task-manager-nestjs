@@ -19,9 +19,6 @@ export class UserEntity {
   @Column({ type: 'varchar', length: 255, nullable: false, unique: true })
   public email: string;
 
-  @Column({ type: 'char', length: 43, nullable: false })
-  public password: string;
-
   @CreateDateColumn()
   public createdAt: Date;
 
@@ -32,4 +29,7 @@ export class UserEntity {
     cascade: true,
   })
   public tasks?: TaskEntity[];
+
+  @Column({ type: 'char', length: 60, nullable: false })
+  public password: string;
 }

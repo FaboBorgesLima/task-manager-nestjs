@@ -27,11 +27,22 @@ export class UserAdapter {
     };
   }
 
+  public static fromResponseDTO(user: UserResponseDto): UserAdapter {
+    const userDomain = new User({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    });
+
+    return UserAdapter.fromDomain(userDomain);
+  }
+
   public static fromPersistence(user: UserEntity): UserAdapter {
     const userDomain = new User({
       name: user.name,
       email: user.email,
-      password: user.password,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     });
@@ -42,10 +53,9 @@ export class UserAdapter {
 
   public toPersistence(): UserEntity {
     const userEntity = new UserEntity();
-    userEntity.name = this.user.getName();
-    userEntity.email = this.user.getEmail();
-    userEntity.password = this.user.getPassword();
-    userEntity.createdAt = this.user.getCreatedAt();
+    userEntity.name = this.user.name;
+    userEntity.email = this.user.email;
+    userEntity.createdAt = this.user.createdAt;
     userEntity.updatedAt = this.user.updatedAt;
     if (this.user.id) {
       userEntity.id = this.user.id;

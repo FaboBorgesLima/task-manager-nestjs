@@ -1,44 +1,49 @@
 import { Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
-import { AbstractAuthService } from '@faboborgeslima/task-manager-domain/auth';
-import { AuthJwtService } from '../infra/services/auth-jwt.service';
-import { HashService } from '../../hash/app/hash.service';
+import { AuthService } from './auth.service';
 import { JwtConfigModule } from '../../jwt/jwt-config.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from '../../user/infra/user.entity';
-import { HashServiceInterface } from '@faboborgeslima/task-manager-domain/hash';
 import { UserRepositoryInterface } from '@faboborgeslima/task-manager-domain/user';
-import { UserTypeORMService } from '../../user/infra/services/user-typeorm.service';
+import { UserTypeormRepository } from '../../user/infra/repositories/user-typeorm.repository';
+import {
+  AuthRepositoryInterface,
+  EmailValidationServiceInterface,
+} from '@faboborgeslima/task-manager-domain/auth';
+import { MockEmailValidationService } from '../infra/services/mock-email-validation.service';
+import { AuthJwtRespository } from '../infra/repositories/auth-jwt.repository';
 
 @Module({
   controllers: [AuthController],
   providers: [
     {
       provide: UserRepositoryInterface,
-      useClass: UserTypeORMService,
+      useClass: UserTypeormRepository,
     },
     {
-      provide: AbstractAuthService,
-      useClass: AuthJwtService,
+      provide: EmailValidationServiceInterface,
+      useClass: MockEmailValidationService,
     },
     {
-      provide: HashServiceInterface,
-      useClass: HashService,
+      provide: AuthRepositoryInterface,
+      useClass: AuthJwtRespository,
     },
+    AuthService,
   ],
   imports: [JwtConfigModule, TypeOrmModule.forFeature([UserEntity])],
   exports: [
-    {
-      provide: AbstractAuthService,
-      useClass: AuthJwtService,
-    },
-    {
-      provide: HashServiceInterface,
-      useClass: HashService,
-    },
+    AuthService,
     {
       provide: UserRepositoryInterface,
-      useClass: UserTypeORMService,
+      useClass: UserTypeormRepository,
+    },
+    {
+      provide: AuthRepositoryInterface,
+      useClass: AuthJwtRespository,
+    },
+    {
+      provide: EmailValidationServiceInterface,
+      useClass: MockEmailValidationService,
     },
     TypeOrmModule.forFeature([UserEntity]),
   ],

@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TaskController } from './task.controller';
-import { UserMemoryService } from '../../user/infra/services/user-memory.service';
+import { UserMemoryRepository } from '../../user/infra/repositories/user-memory.repository';
 import {
   User,
   UserRepositoryInterface,
@@ -10,28 +10,27 @@ import {
   TaskStatus,
   TaskRepositoryInterface,
 } from '@faboborgeslima/task-manager-domain/task';
-import { AbstractAuthService } from '@faboborgeslima/task-manager-domain/auth';
-import { AuthIdService } from '../../auth/infra/services/auth-id.service';
+import { AuthService } from '@faboborgeslima/task-manager-domain/auth';
+import { AuthIdRepository } from '../../auth/infra/repositories/auth-id.repository';
 import { TaskMemoryRepository } from '../infra/services/task-memory.repository';
-import { HashMockService } from '@faboborgeslima/task-manager-domain/hash';
+import { MockEmailValidationService } from '../../auth/infra/services/mock-email-validation.service';
 
 describe('TaskController', () => {
   let controller: TaskController;
-  const userService: UserRepositoryInterface = new UserMemoryService();
-  const taskService: TaskRepositoryInterface = new TaskMemoryRepository();
-  const authService: AbstractAuthService = new AuthIdService(userService);
+  const userRepository: UserRepositoryInterface = new UserMemoryRepository();
+  const taskRepository: TaskRepositoryInterface = new TaskMemoryRepository();
+  const authService: AuthService = new AuthService(
+    new AuthIdRepository(userRepository),
+    new MockEmailValidationService(),
+  );
   let user: User;
 
   beforeAll(async () => {
-    user = User.create(
-      {
-        name: faker.person.fullName(),
-        email: faker.internet.email(),
-        password: faker.internet.password(),
-      },
-      HashMockService.getInstance(),
-    );
-    await userService.saveOne(user);
+    user = User.create({
+      name: faker.person.fullName(),
+      email: faker.internet.email(),
+    });
+    await userRepository.saveOne(user);
   });
 
   beforeEach(async () => {
@@ -41,14 +40,14 @@ describe('TaskController', () => {
       providers: [
         {
           provide: UserRepositoryInterface,
-          useValue: userService,
+          useValue: userRepository,
         },
         {
           provide: TaskRepositoryInterface,
-          useValue: taskService,
+          useValue: taskRepository,
         },
         {
-          provide: AbstractAuthService,
+          provide: AuthService,
           useValue: authService,
         },
       ],
@@ -153,7 +152,7 @@ describe('TaskController', () => {
 
     await controller.delete(task.id || '', user);
 
-    const deletedTask = await taskService.findById(task.id || '');
+    const deletedTask = await taskRepository.findById(task.id || '');
     expect(deletedTask).toBeUndefined();
   });
 });
