@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from '../src/app.module';
-import { AuthService } from '../src/auth/app/auth.service';
+import { AuthService } from '../src/auth/app/services/auth.service';
 import typeormModule from '../src/database/typeorm.module';
 import { User } from '@faboborgeslima/task-manager-domain/user';
 import request from 'supertest';
@@ -13,7 +13,7 @@ import {
 } from '@nestjs/platform-fastify';
 import { HttpStatus } from '@nestjs/common';
 import { bootstrap } from '../src/bootstrap';
-import { MockEmailValidationService } from '../src/auth/infra/services/mock-email-validation.service';
+import { MockEmailValidationService } from '../src/auth/app/services/mock-email-validation.service';
 import { EmailValidationServiceInterface } from '@faboborgeslima/task-manager-domain/auth';
 
 describe('TaskController (e2e)', () => {

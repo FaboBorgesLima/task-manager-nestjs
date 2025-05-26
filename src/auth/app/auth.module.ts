@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
+import { AuthService } from './services/auth.service';
 import { JwtConfigModule } from '../../jwt/jwt-config.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from '../../user/infra/user.entity';
@@ -10,7 +10,7 @@ import {
   AuthRepositoryInterface,
   EmailValidationServiceInterface,
 } from '@faboborgeslima/task-manager-domain/auth';
-import { MockEmailValidationService } from '../infra/services/mock-email-validation.service';
+import { MockEmailValidationService } from './services/mock-email-validation.service';
 import { AuthJwtRespository } from '../infra/repositories/auth-jwt.repository';
 
 @Module({

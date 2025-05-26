@@ -11,7 +11,7 @@ import {
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
 import { EmailValidationServiceInterface } from '@faboborgeslima/task-manager-domain/auth';
-import { MockEmailValidationService } from '../src/auth/infra/services/mock-email-validation.service';
+import { MockEmailValidationService } from '../src/auth/app/services/mock-email-validation.service';
 
 describe('UserController (e2e)', () => {
   let app: NestFastifyApplication;

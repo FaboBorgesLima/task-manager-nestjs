@@ -8,8 +8,8 @@ import {
 } from '@faboborgeslima/task-manager-domain/auth';
 import { AuthIdRepository } from '../infra/repositories/auth-id.repository';
 import { faker } from '@faker-js/faker';
-import { AuthService } from './auth.service';
-import { MockEmailValidationService } from '../infra/services/mock-email-validation.service';
+import { AuthService } from './services/auth.service';
+import { MockEmailValidationService } from './services/mock-email-validation.service';
 
 describe('AuthController', () => {
   let controller: AuthController;

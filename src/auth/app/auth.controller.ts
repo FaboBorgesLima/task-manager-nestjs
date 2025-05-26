@@ -20,7 +20,7 @@ import {
   ApiHeaders,
   ApiResponse,
 } from '@nestjs/swagger';
-import { AuthService } from './auth.service';
+import { AuthService } from './services/auth.service';
 import { User } from '@faboborgeslima/task-manager-domain/user';
 import { AuthRegisterDto } from './dtos/auth-register.dto';
 import { Auth } from '@faboborgeslima/task-manager-domain/auth';

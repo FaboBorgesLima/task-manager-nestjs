@@ -13,7 +13,7 @@ import {
 import { AuthService } from '@faboborgeslima/task-manager-domain/auth';
 import { AuthIdRepository } from '../../auth/infra/repositories/auth-id.repository';
 import { TaskMemoryRepository } from '../infra/services/task-memory.repository';
-import { MockEmailValidationService } from '../../auth/infra/services/mock-email-validation.service';
+import { MockEmailValidationService } from '../../auth/app/services/mock-email-validation.service';
 
 describe('TaskController', () => {
   let controller: TaskController;
