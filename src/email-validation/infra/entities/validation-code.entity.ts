@@ -5,8 +5,8 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-@Entity('email_validations')
-export class EmailValidationEntity {
+@Entity('validation_codes')
+export class ValidationCodeEntity {
   @PrimaryGeneratedColumn({
     type: 'bigint',
     name: 'id',

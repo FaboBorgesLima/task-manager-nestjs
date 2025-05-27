@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { AuthModule } from '../auth/app/auth.module';
 import TypeormModule from '../database/typeorm.module';
 import { ConfigModule } from '@nestjs/config';
+import { EmailModule } from '../email/app/email.module';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { ConfigModule } from '@nestjs/config';
       envFilePath: '.env',
       isGlobal: true,
     }),
+    EmailModule,
   ],
   controllers: [],
   providers: [],
@@ -18,6 +20,7 @@ import { ConfigModule } from '@nestjs/config';
     TypeormModule,
     AuthModule,
     ConfigModule,
+    EmailModule,
     // Add any other shared services or modules here
   ],
 })

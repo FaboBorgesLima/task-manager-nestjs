@@ -13,8 +13,8 @@ import {
 } from '@nestjs/platform-fastify';
 import { HttpStatus } from '@nestjs/common';
 import { bootstrap } from '../src/bootstrap';
-import { MockEmailValidationService } from '../src/auth/app/services/mock-email-validation.service';
-import { EmailValidationServiceInterface } from '@faboborgeslima/task-manager-domain/auth';
+import { EmailServiceInterface } from '../src/email/domain/email.service.interface';
+import { EmailMockService } from '../src/email/app/email-mock.service';
 
 describe('TaskController (e2e)', () => {
   let app: NestFastifyApplication;
@@ -26,8 +26,8 @@ describe('TaskController (e2e)', () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule, typeormModule],
     })
-      .overrideProvider(EmailValidationServiceInterface)
-      .useClass(MockEmailValidationService)
+      .overrideProvider(EmailServiceInterface)
+      .useClass(EmailMockService)
       .compile();
 
     app = moduleFixture.createNestApplication<NestFastifyApplication>(
@@ -45,13 +45,19 @@ describe('TaskController (e2e)', () => {
       name: faker.person.fullName(),
       email: faker.internet.email(),
     });
+    await authService.sendValidation(user.email);
+    const validationCode = EmailMockService.emails
+      .get(user.email)
+      ?.text.split(' ')
+      .pop();
+
     const register = await authService.register(
       user,
       {
         email: user.email,
         password: faker.internet.password(),
       },
-      MockEmailValidationService.VALIDATION_CODE,
+      validationCode as string,
     );
     token = register.token;
   });

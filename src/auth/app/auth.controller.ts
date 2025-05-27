@@ -24,6 +24,7 @@ import { AuthService } from './services/auth.service';
 import { User } from '@faboborgeslima/task-manager-domain/user';
 import { AuthRegisterDto } from './dtos/auth-register.dto';
 import { Auth } from '@faboborgeslima/task-manager-domain/auth';
+import { SendValidationDto } from './dtos/send-validation.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -96,5 +97,25 @@ export class AuthController {
     }
 
     return auth;
+  }
+
+  @Post('/send-validation')
+  @ApiBody({
+    description: 'Send validation email',
+    type: SendValidationDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Validation code sent successfully',
+  })
+  public async sendValidation(@Body() sendValidationDto: SendValidationDto) {
+    try {
+      return await this.authService.sendValidation(sendValidationDto.email);
+    } catch {
+      throw new HttpException(
+        'Error sending validation code',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }
