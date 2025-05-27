@@ -1,6 +1,6 @@
 import { HttpStatus, Inject, Injectable, NestMiddleware } from '@nestjs/common';
 import { IncomingMessage, ServerResponse } from 'http';
-import { AuthService } from '../auth.service';
+import { AuthService } from '../services/auth.service';
 import { User } from '@faboborgeslima/task-manager-domain/user';
 
 @Injectable()

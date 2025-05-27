@@ -13,7 +13,9 @@ import {
 import { AuthService } from '@faboborgeslima/task-manager-domain/auth';
 import { AuthIdRepository } from '../../auth/infra/repositories/auth-id.repository';
 import { TaskMemoryRepository } from '../infra/services/task-memory.repository';
-import { MockEmailValidationService } from '../../auth/infra/services/mock-email-validation.service';
+import { ValidationCodeMemoryRepository } from '../../email-validation/infra/repositories/validation-code-memory.repository';
+import { EmailValidationService } from '../../email-validation/app/email-validation.service';
+import { EmailMockService } from '../../email/app/email-mock.service';
 
 describe('TaskController', () => {
   let controller: TaskController;
@@ -21,7 +23,10 @@ describe('TaskController', () => {
   const taskRepository: TaskRepositoryInterface = new TaskMemoryRepository();
   const authService: AuthService = new AuthService(
     new AuthIdRepository(userRepository),
-    new MockEmailValidationService(),
+    new EmailValidationService(
+      new ValidationCodeMemoryRepository(),
+      new EmailMockService(),
+    ),
   );
   let user: User;
 

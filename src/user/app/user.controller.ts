@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { UserRepositoryInterface } from '@faboborgeslima/task-manager-domain/user';
 import { AuthRepositoryInterface } from '@faboborgeslima/task-manager-domain/auth';
-import { AuthService } from '../../auth/app/auth.service';
+import { AuthService } from '../../auth/app/services/auth.service';
 import { UserUpdateDto } from './dtos/user-update-dto';
 import {
   ApiBodyUserResponseInterceptor,

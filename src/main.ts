@@ -9,7 +9,7 @@ import { bootstrap } from './bootstrap';
 async function main() {
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
-    new FastifyAdapter(),
+    new FastifyAdapter({}),
   );
 
   bootstrap(app);

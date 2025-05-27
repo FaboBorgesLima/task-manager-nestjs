@@ -14,7 +14,7 @@ export default (() => {
       password: process.env.POSTGRES_PASSWORD,
       database: process.env.POSTGRES_DB,
       entities,
-      synchronize: true,
+      synchronize: false,
       migrations: ['src/migrations/*.ts'],
       migrationsRun: true,
     } as TypeOrmModuleOptions;
@@ -28,7 +28,7 @@ export default (() => {
     password: process.env.POSTGRES_PASSWORD,
     database: process.env.POSTGRES_DB,
     entities,
-    synchronize: true,
+    synchronize: false,
     migrations: ['dist/migrations/*.js'],
     migrationsRun: true,
   } as TypeOrmModuleOptions;
