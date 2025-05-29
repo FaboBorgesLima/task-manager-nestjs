@@ -15,7 +15,6 @@ export class EmailMockService implements EmailServiceInterface {
     html: string,
   ): Promise<void> {
     EmailMockService.emails.set(to, { subject, text, html });
-    console.log(`Mock email sent to ${to} with subject "${subject}"`);
 
     return Promise.resolve();
   }
