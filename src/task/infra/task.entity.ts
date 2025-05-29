@@ -12,7 +12,7 @@ import { UserEntity } from '../../user/infra/user.entity'; // Adjust the import 
 
 @Entity('tasks')
 export class TaskEntity {
-  @PrimaryGeneratedColumn('increment', { unsigned: true, type: 'bigint' })
+  @PrimaryGeneratedColumn('uuid')
   public id?: string;
 
   @Column({ type: 'varchar', length: 255, nullable: false })
