@@ -31,14 +31,12 @@ export class EmailService implements EmailServiceInterface {
       html,
     };
     const transporter = this.createTransporter();
-    console.debug('Sending email with options:', mailOptions);
-    console.debug('Transporter configuration:', process.env.EMAIL_PASS);
     // Send the email
     const sended = await transporter.sendMail(mailOptions);
     if (sended.rejected.length > 0) {
       throw new Error('Email not sent');
     }
-    console.debug('Email sent successfully:', sended);
+
     transporter.close();
   }
 }

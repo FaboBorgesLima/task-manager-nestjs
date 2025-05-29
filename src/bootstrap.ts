@@ -13,6 +13,6 @@ export function bootstrap<T>(app: INestApplication<T>) {
     .build();
 
   const documentFactory = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, documentFactory);
+  SwaggerModule.setup('swagger', app, documentFactory);
   return app;
 }
