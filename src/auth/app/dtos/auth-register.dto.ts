@@ -2,7 +2,6 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsString } from 'class-validator';
 import { AuthCredentials } from '@faboborgeslima/task-manager-domain/auth/types';
 import { UserCreateProps } from '@faboborgeslima/task-manager-domain/user/types';
-import { MockEmailValidationService } from '../../../auth/infra/services/mock-email-validation.service';
 
 export class AuthRegisterDto implements AuthCredentials, UserCreateProps {
   @ApiProperty({
@@ -31,8 +30,8 @@ export class AuthRegisterDto implements AuthCredentials, UserCreateProps {
 
   @ApiProperty({
     description: 'Validation string sended by email',
-    example: MockEmailValidationService.VALIDATION_CODE,
-    default: MockEmailValidationService.VALIDATION_CODE,
+    example: '123456',
+    default: '123456',
     required: true,
   })
   @IsString()

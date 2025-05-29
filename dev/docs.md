@@ -53,3 +53,9 @@ npm run test
 ```bash
 docker compose run --rm server npm run test:e2e
 ```
+
+3. for generating migrations:
+
+```bash
+docker compose run --rm server npm run migration:generate
+```

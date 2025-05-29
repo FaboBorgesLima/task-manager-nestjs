@@ -8,8 +8,9 @@ import {
   FastifyAdapter,
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
-import { EmailValidationServiceInterface } from '@faboborgeslima/task-manager-domain/auth';
-import { MockEmailValidationService } from '../src/auth/infra/services/mock-email-validation.service';
+import { EmailServiceInterface } from '../src/email/domain/email.service.interface';
+import { EmailMockService } from '../src/email/app/email-mock.service';
+import { UserResponseDto } from '../src/user/app/dtos/user-response-dto';
 
 describe('AuthController (e2e)', () => {
   let app: NestFastifyApplication;
@@ -19,12 +20,45 @@ describe('AuthController (e2e)', () => {
     await clearDatabase();
   });
 
+  async function registerUser(props: {
+    email: string;
+    name: string;
+    password: string;
+  }): Promise<{
+    token: string;
+    user: UserResponseDto;
+  }> {
+    await request(app.getHttpServer()).post('/auth/send-validation').send({
+      email: props.email,
+    });
+    const validationCode = EmailMockService.emails
+      .get(props.email)
+      ?.text.split(' ')
+      .pop();
+    expect(validationCode).toBeDefined();
+
+    const response = await request(app.getHttpServer())
+      .post('/auth/register')
+      .send({
+        name: props.name,
+        email: props.email,
+        password: props.password,
+        validation: validationCode,
+      });
+
+    expect(response.status).toBe(201);
+    expect(response.body).toHaveProperty('token');
+    const body = response.body as { token: string; user: UserResponseDto };
+
+    return body;
+  }
+
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule, typeormModule],
     })
-      .overrideProvider(EmailValidationServiceInterface)
-      .useClass(MockEmailValidationService)
+      .overrideProvider(EmailServiceInterface)
+      .useClass(EmailMockService)
       .compile();
 
     app = moduleFixture.createNestApplication<NestFastifyApplication>(
@@ -37,13 +71,22 @@ describe('AuthController (e2e)', () => {
 
   it('/auth/register (POST)', async () => {
     const email = faker.internet.email();
+    await request(app.getHttpServer()).post('/auth/send-validation').send({
+      email,
+    });
+    const validationCode = EmailMockService.emails
+      .get(email)
+      ?.text.split(' ')
+      .pop();
+    expect(validationCode).toBeDefined();
+
     const response = await request(app.getHttpServer())
       .post('/auth/register')
       .send({
         name: faker.person.fullName(),
         email,
         password: 'password123',
-        validation: MockEmailValidationService.VALIDATION_CODE,
+        validation: validationCode,
       });
     expect(response.status).toBe(201);
     expect(response.body).toHaveProperty('token');
@@ -52,15 +95,11 @@ describe('AuthController (e2e)', () => {
   it('/auth/login (POST)', async () => {
     const email = faker.internet.email();
     // First, create a user to test the login
-    await request(app.getHttpServer())
-      .post('/auth/register')
-      .send({
-        name: faker.person.fullName(),
-        email,
-        password: 'password123',
-        validation: MockEmailValidationService.VALIDATION_CODE,
-      })
-      .expect(201);
+    await registerUser({
+      name: faker.person.fullName(),
+      email,
+      password: 'password123',
+    });
 
     // Now, test the login endpoint
     const response = await request(app.getHttpServer())
@@ -87,21 +126,15 @@ describe('AuthController (e2e)', () => {
   it('/auth/me (GET)', async () => {
     const email = faker.internet.email();
     // First, create a user to test the login
-    const createResponse = await request(app.getHttpServer())
-      .post('/auth/register')
-      .send({
-        name: faker.person.fullName(),
-        email,
-        password: 'password123',
-        validation: MockEmailValidationService.VALIDATION_CODE,
-      });
-    const body = createResponse.body as {
-      token: string;
-    };
+    const createResponse = await registerUser({
+      name: faker.person.fullName(),
+      email,
+      password: 'password123',
+    });
 
     const response = await request(app.getHttpServer())
       .get('/auth/me')
-      .set('Authorization', `Bearer ${body.token}`);
+      .set('Authorization', `Bearer ${createResponse.token}`);
 
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty('user.email', email);

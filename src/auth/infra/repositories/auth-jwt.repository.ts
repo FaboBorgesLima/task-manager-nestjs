@@ -15,7 +15,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from '../../../user/infra/user.entity';
 import bcrypt from 'bcrypt';
 import { UserAdapter } from '../../../user/infra/user-adapter';
-import { UserResponseDto } from 'src/user/app/dtos/user-response-dto';
+import { UserResponseDto } from '../../../user/app/dtos/user-response-dto';
 
 @Injectable()
 export class AuthJwtRespository implements AuthRepositoryInterface {
