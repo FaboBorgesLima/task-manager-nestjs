@@ -24,12 +24,12 @@ import {
 import { DateRangeDto } from '../../types/app/date-range-dto';
 import { TaskResponseInterceptor } from './interceptors/task-response.interceptor';
 import { TaskListResponseInterceptor } from './interceptors/task-list-response.interceptor';
-import { BigIntPipe } from '../../big-int/big-int.pipe';
 import { Auth } from '../../auth/app/decorators/auth.decorator';
 import {
   User,
   UserRepositoryInterface,
 } from '@faboborgeslima/task-manager-domain/user';
+import { UuidPipe } from '../../uuid/uuid.pipe';
 
 @Controller('tasks')
 @ApiBearerAuth()
@@ -70,7 +70,7 @@ export class TaskController {
     type: TaskListResponseDto,
   })
   async findFromUser(
-    @Param('user', BigIntPipe) userId: string,
+    @Param('user', UuidPipe) userId: string,
     @Auth() requestUser: User,
     @Query() range: DateRangeDto,
   ) {
@@ -102,7 +102,7 @@ export class TaskController {
     type: TaskResponseDto,
   })
   async findOne(
-    @Param('task', BigIntPipe) taskId: string,
+    @Param('task', UuidPipe) taskId: string,
     @Auth() requestUser: User,
   ) {
     const [task] = await Promise.all([this.taskRepository.findById(taskId)]);
@@ -138,7 +138,7 @@ export class TaskController {
   @Put('/:task')
   @UseInterceptors(TaskResponseInterceptor)
   async update(
-    @Param('task', BigIntPipe) taskId: string,
+    @Param('task', UuidPipe) taskId: string,
     @Body() taskUpdateDTO: TaskUpdateDto,
     @Auth() requestUser: User,
   ) {
@@ -161,7 +161,7 @@ export class TaskController {
 
   @Delete('/:task')
   async delete(
-    @Param('task', BigIntPipe) taskId: string,
+    @Param('task', UuidPipe) taskId: string,
     @Auth() authorization: User,
   ) {
     const task = await this.taskRepository.findById(taskId);
