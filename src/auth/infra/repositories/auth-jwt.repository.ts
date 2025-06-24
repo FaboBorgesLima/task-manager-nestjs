@@ -50,7 +50,12 @@ export class AuthJwtRespository implements AuthRepositoryInterface {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    return { token: '', user: UserAdapter.fromPersistence(user).toDomain() };
+    return {
+      token: this.jwtService.sign(
+        UserAdapter.fromPersistence(user).toResponseDTO(),
+      ),
+      user: UserAdapter.fromPersistence(user).toDomain(),
+    };
   }
 
   async register(
