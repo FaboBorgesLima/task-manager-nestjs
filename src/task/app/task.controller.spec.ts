@@ -16,6 +16,7 @@ import { TaskMemoryRepository } from '../infra/services/task-memory.repository';
 import { ValidationCodeMemoryRepository } from '../../email-validation/infra/repositories/validation-code-memory.repository';
 import { EmailValidationService } from '../../email-validation/app/email-validation.service';
 import { EmailMockService } from '../../email/app/email-mock.service';
+import { TaskService } from './task.service';
 
 describe('TaskController', () => {
   let controller: TaskController;
@@ -55,6 +56,7 @@ describe('TaskController', () => {
           provide: AuthService,
           useValue: authService,
         },
+        TaskService,
       ],
     }).compile();
 
@@ -70,7 +72,7 @@ describe('TaskController', () => {
       {
         title: 'Test Task',
         description: 'This is a test task',
-        userId: '',
+        userId: user.id as string,
         start: new Date(),
         end: new Date(),
       },
@@ -86,8 +88,10 @@ describe('TaskController', () => {
 
   it('should return tasks for a user', async () => {
     const tasks = await controller.findFromUser(user.id || '', user, {
-      endDate: new Date(),
-      startDate: new Date(),
+      pagination: {
+        size: 10,
+        page: 1,
+      },
     });
 
     expect(tasks).toBeDefined();
@@ -99,7 +103,7 @@ describe('TaskController', () => {
       {
         title: 'Test Task',
         description: 'This is a test task',
-        userId: '',
+        userId: user.id as string,
         start: new Date(),
         end: new Date(),
         status: TaskStatus.PENDING,
@@ -118,7 +122,7 @@ describe('TaskController', () => {
       {
         title: 'Test Task',
         description: 'This is a test task',
-        userId: '',
+        userId: user.id as string,
         start: new Date(),
         end: new Date(),
 
@@ -148,7 +152,7 @@ describe('TaskController', () => {
       {
         title: 'Test Task',
         description: 'This is a test task',
-        userId: '',
+        userId: user.id as string,
         start: new Date(),
         end: new Date(),
       },

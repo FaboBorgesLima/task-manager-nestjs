@@ -5,7 +5,10 @@ import {
   Injectable,
   NestInterceptor,
 } from '@nestjs/common';
-import { DomainError } from '@faboborgeslima/task-manager-domain/error';
+import {
+  DomainError,
+  UnauthorizedError,
+} from '@faboborgeslima/task-manager-domain/error';
 import { catchError, Observable } from 'rxjs';
 
 @Injectable()
@@ -16,6 +19,10 @@ export class DomainErrorInterceptor implements NestInterceptor {
   ): Observable<any> | Promise<Observable<any>> {
     return next.handle().pipe(
       catchError((error) => {
+        if (error instanceof UnauthorizedError) {
+          throw new HttpException(error.message, 401);
+        }
+
         if (error instanceof DomainError) {
           throw new HttpException(error.message, 400);
         }

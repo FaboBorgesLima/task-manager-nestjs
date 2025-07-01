@@ -6,6 +6,7 @@ import { TaskTypeORMRepository } from '../infra/services/task-typorm.repository'
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TaskEntity } from '../infra/task.entity';
 import { AuthMiddleware } from '../../auth/app/middlewares/auth.middleware';
+import { TaskService } from './task.service';
 
 @Module({
   controllers: [TaskController],
@@ -14,6 +15,7 @@ import { AuthMiddleware } from '../../auth/app/middlewares/auth.middleware';
       provide: TaskRepositoryInterface,
       useClass: TaskTypeORMRepository,
     },
+    TaskService,
   ],
   imports: [TypeOrmModule.forFeature([TaskEntity]), SharedModule],
   exports: [
@@ -21,6 +23,7 @@ import { AuthMiddleware } from '../../auth/app/middlewares/auth.middleware';
       provide: TaskRepositoryInterface,
       useClass: TaskTypeORMRepository,
     },
+    TaskService,
   ],
 })
 export class TaskModule implements NestModule {

@@ -21,7 +21,6 @@ import {
   Task,
   TaskRepositoryInterface,
 } from '@faboborgeslima/task-manager-domain/task';
-import { DateRangeDto } from '../../types/app/date-range-dto';
 import { TaskResponseInterceptor } from './interceptors/task-response.interceptor';
 import { TaskListResponseInterceptor } from './interceptors/task-list-response.interceptor';
 import { Auth } from '../../auth/app/decorators/auth.decorator';
@@ -30,17 +29,21 @@ import {
   UserRepositoryInterface,
 } from '@faboborgeslima/task-manager-domain/user';
 import { UuidPipe } from '../../uuid/uuid.pipe';
+import { BigIntPipe } from '../../big-int/big-int.pipe';
+import { TaskService } from './task.service';
+import { OptionalDateRangePaginatedDto } from './dto/optional-date-range-paginated';
 
 @Controller('tasks')
 @ApiBearerAuth()
 export class TaskController {
   public constructor(
-    @Inject(TaskRepositoryInterface)
-    private readonly taskRepository: TaskRepositoryInterface,
+    private readonly taskService: TaskService,
     @Inject(UserRepositoryInterface)
     private readonly userRepository: UserRepositoryInterface,
+    @Inject(TaskRepositoryInterface)
+    private readonly taskRepository: TaskRepositoryInterface,
   ) {
-    // Constructor logic if needed0
+    // Constructor logic if needed
   }
 
   @Get('/')
@@ -51,17 +54,27 @@ export class TaskController {
   })
   async findFromCurrentUser(
     @Auth() requestUser: User,
-    @Query() query: DateRangeDto,
+    @Query() query: OptionalDateRangePaginatedDto,
   ) {
-    return this.findFromUser(requestUser.id || '', requestUser, query);
+    if (query.startDate && query.endDate) {
+      return this.taskService.findByUserAndDate(
+        requestUser,
+        requestUser,
+        query.startDate,
+        query.endDate,
+        query.size,
+        query.page,
+      );
+    }
+
+    return this.taskService.findByUser(
+      requestUser,
+      requestUser,
+      query.size,
+      query.page,
+    );
   }
 
-  /**
-   * TODO: Add pagination
-   * @param user
-   * @param requestUser
-   * @returns
-   */
   @ApiParam({ name: 'user', type: String })
   @Get('/users/:user')
   @UseInterceptors(TaskListResponseInterceptor)
@@ -70,29 +83,31 @@ export class TaskController {
     type: TaskListResponseDto,
   })
   async findFromUser(
-    @Param('user', UuidPipe) userId: string,
+    @Param('user', BigIntPipe) userId: string,
     @Auth() requestUser: User,
-    @Query() range: DateRangeDto,
+    @Query() query: OptionalDateRangePaginatedDto,
   ) {
     const user = await this.userRepository.findOne(userId);
-
     if (!user) {
-      throw new UnauthorizedException('User not found');
+      throw new NotFoundException('User not found');
+    }
+    if (query.startDate && query.endDate) {
+      return this.taskService.findByUserAndDate(
+        user,
+        requestUser,
+        query.startDate,
+        query.endDate,
+        query.size,
+        query.page,
+      );
     }
 
-    if (!requestUser.canViewTasks(user)) {
-      throw new UnauthorizedException('User cannot view tasks for this user');
-    }
-
-    const tasks = range
-      ? await this.taskRepository.findByUserAndDate(
-          userId,
-          range.startDate,
-          range.endDate,
-        )
-      : await this.taskRepository.findByUser(userId);
-
-    return tasks;
+    return this.taskService.findByUser(
+      user,
+      requestUser,
+      query.size,
+      query.page,
+    );
   }
 
   @Get('/:task')
@@ -105,14 +120,10 @@ export class TaskController {
     @Param('task', UuidPipe) taskId: string,
     @Auth() requestUser: User,
   ) {
-    const [task] = await Promise.all([this.taskRepository.findById(taskId)]);
+    const task = await this.taskService.findById(requestUser, taskId);
 
     if (!task) {
       throw new NotFoundException('Task not found');
-    }
-
-    if (!task.canBeViewed(requestUser)) {
-      throw new UnauthorizedException('User cannot view this task');
     }
 
     return task;
@@ -124,11 +135,13 @@ export class TaskController {
     @Body() taskCreateDTO: TaskCreateDTO,
     @Auth() requestUser: User,
   ) {
-    taskCreateDTO.userId = requestUser.id || '';
-
-    const task = await this.taskRepository.save(Task.make(taskCreateDTO));
-
-    return task;
+    if (!taskCreateDTO.userId) {
+      if (!requestUser.id) {
+        throw new UnauthorizedException('User does not have an ID');
+      }
+      taskCreateDTO.userId = requestUser.id;
+    }
+    return this.taskService.save(requestUser, Task.make(taskCreateDTO));
   }
 
   @ApiOkResponse({
@@ -148,13 +161,9 @@ export class TaskController {
       throw new NotFoundException('Task not found');
     }
 
-    if (!task.canBeUpdated(requestUser)) {
-      throw new UnauthorizedException('User cannot edit this task');
-    }
-
     task.update(taskUpdateDTO);
 
-    task = await this.taskRepository.save(task);
+    task = await this.taskService.save(requestUser, task);
 
     return task;
   }
@@ -170,10 +179,6 @@ export class TaskController {
       throw new NotFoundException('Task not found');
     }
 
-    if (!task.canBeDeleted(authorization)) {
-      throw new UnauthorizedException('User cannot delete this task');
-    }
-
-    return await this.taskRepository.delete(taskId);
+    return this.taskService.delete(authorization, task);
   }
 }

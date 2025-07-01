@@ -8,6 +8,7 @@ import { SharedModule } from './shared/shared.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { DomainErrorInterceptor } from './error/app/domain-error-interceptor';
 import { EmailModule } from './email/app/email.module';
+import { TaskService } from './task/app/task.service';
 
 @Module({
   imports: [SharedModule, UserModule, AuthModule, TaskModule, EmailModule],
@@ -18,6 +19,7 @@ import { EmailModule } from './email/app/email.module';
       provide: APP_INTERCEPTOR,
       useClass: DomainErrorInterceptor,
     },
+    TaskService,
   ],
 })
 export class AppModule {}
