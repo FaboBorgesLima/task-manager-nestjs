@@ -69,6 +69,7 @@ describe('TaskController (e2e)', () => {
       .send({
         title: 'Test Task',
         description: 'This is a test task',
+        userId: user.id as string,
         start: new Date(),
         end: new Date(),
       })
@@ -84,13 +85,23 @@ describe('TaskController (e2e)', () => {
       .get('/tasks')
       .expect(HttpStatus.UNAUTHORIZED);
 
-    const response = await request(app.getHttpServer())
-      .get('/tasks?startDate=2023-01-01&endDate=2023-12-31')
+    let response = await request(app.getHttpServer())
+      .get('/tasks?size=10&page=0&startDate=2023-01-01&endDate=2023-12-31')
       .set('Authorization', `Bearer ${token}`)
+
       .expect(200);
 
     expect(response.body).toBeDefined();
-    expect(Array.isArray(response.body)).toBe(true);
+    expect(response.body).toHaveProperty('tasks');
+
+    response = await request(app.getHttpServer())
+      .get('/tasks?size=10&page=0')
+      .set('Authorization', `Bearer ${token}`)
+
+      .expect(200);
+
+    expect(response.body).toBeDefined();
+    expect(response.body).toHaveProperty('tasks');
   });
 
   it('/tasks/:id (GET)', async () => {

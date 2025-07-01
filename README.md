@@ -31,7 +31,7 @@ npm install
 
 ```bash
 # run the application on docker
-docker-compose up -d
+docker compose up -d
 ```
 
 ## Details

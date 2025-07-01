@@ -26,10 +26,19 @@ export class TaskTypeORMRepository implements TaskRepositoryInterface {
     return TaskAdapter.fromEntity(taskEntity).toDomain();
   }
 
-  async findByUser(userId: string): Promise<Task[]> {
+  async findByUser(
+    userId: string,
+    size: number,
+    page: number,
+  ): Promise<Task[]> {
     if (!userId) return [];
 
-    const tasks = await this.taskRepository.find({ where: { userId } });
+    const tasks = await this.taskRepository.find({
+      where: { userId },
+      skip: page * size,
+      take: size,
+    });
+
     return tasks.map((task) => TaskAdapter.fromEntity(task).toDomain());
   }
 
@@ -37,6 +46,8 @@ export class TaskTypeORMRepository implements TaskRepositoryInterface {
     userId: string,
     startDate: Date,
     endDate: Date,
+    size: number,
+    page: number,
   ): Promise<Task[]> {
     const tasks = await this.taskRepository
       .createQueryBuilder('task')
@@ -45,6 +56,8 @@ export class TaskTypeORMRepository implements TaskRepositoryInterface {
         '(task.start BETWEEN :startDate AND :endDate OR task.end BETWEEN :startDate AND :endDate)',
         { startDate, endDate },
       )
+      .skip(page * size)
+      .take(size)
       .getMany();
 
     return tasks.map((task) => TaskAdapter.fromEntity(task).toDomain());
